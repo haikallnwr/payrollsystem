@@ -45,15 +45,13 @@ enum JobLevel {
 
 model User {
   id                     Int             @id @default(autoincrement())
-  employee_id            Int?            @unique
-  full_name              String          @db.VarChar(150)
   email                  String          @unique
   password               String
-  role                   RoleUser
+  role                   RoleUser        @default(EMPLOYEE)
   is_deleted             Boolean         @default(false)
   created_at             DateTime        @default(now())
   updated_at             DateTime        @updatedAt
-  employee               Employee?       @relation(fields: [employee_id], references: [id])
+  employee               Employee?
   reimbursementsApproved Reimbursement[] @relation("ApprovedBy")
   overtimesCreated       Overtime[]
   payrollsGenerated      Payroll[]
@@ -85,10 +83,10 @@ model JobPosition {
 
 model Employee {
   id                Int              @id @default(autoincrement())
+  user_id           Int?             @unique
   employee_code     String           @unique
   job_position_id   Int
   full_name         String
-  email             String           @unique
   phone             String?
   join_date         DateTime
   base_salary       Decimal          @db.Decimal(15, 2)
@@ -98,7 +96,7 @@ model Employee {
   created_at        DateTime         @default(now())
   updated_at        DateTime         @updatedAt
   job_position      JobPosition      @relation(fields: [job_position_id], references: [id])
-  user              User?
+  user              User?            @relation(fields: [user_id], references: [id])
   reimbursements    Reimbursement[]
   overtimes         Overtime[]
   payrolls          Payroll[]
