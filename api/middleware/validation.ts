@@ -57,7 +57,6 @@ export class UseValidation {
 
   static readonly EMPLOYEE_CREATE: ZodType = z.object({
     user_id: z.number().int().positive().optional(),
-    employee_code: z.string().trim().min(1).max(30),
     job_position_id: z.number().int().positive(),
     full_name: z.string().trim().min(3).max(100),
     phone: z.string().trim().max(20).optional(),
@@ -70,7 +69,6 @@ export class UseValidation {
 
   static readonly EMPLOYEE_UPDATE: ZodType = z.object({
     user_id: z.number().int().positive().optional(),
-    employee_code: z.string().trim().min(1).max(30).optional(),
     job_position_id: z.number().int().positive().optional(),
     full_name: z.string().trim().min(3).max(100).optional(),
     phone: z.string().trim().max(20).optional(),
@@ -78,6 +76,9 @@ export class UseValidation {
     base_salary: z.number().positive().optional(),
     bank_name: z.string().trim().max(100).optional(),
     bank_account: z.string().trim().max(50).optional(),
+  });
+
+  static readonly EMPLOYEE_UPDATE_STATUS: ZodType = z.object({
     employment_status: z.enum(Object.values(EmploymentStatus) as [EmploymentStatus, ...EmploymentStatus[]]).optional(),
   });
 

@@ -22,8 +22,8 @@ export class DivisionController {
     try {
       const result = await DivisionService.getAllDivision();
 
-      res.status(201).json({
-        code: 201,
+      res.status(200).json({
+        code: 200,
         message: "Success get all division",
         data: result,
       });
