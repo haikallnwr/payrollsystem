@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { userRouter } from "./routes/user";
 import { divisionRouter } from "./routes/division";
+import { jobPositionRouter } from "./routes/jobPosition";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/divisions", divisionRouter);
+app.use("/api/jobPosition", jobPositionRouter);
 
 app.use(errorHandler);
 

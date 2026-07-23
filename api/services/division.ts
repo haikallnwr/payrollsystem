@@ -2,7 +2,7 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
-import { DivisionCreateRequest, DivisionResponse, toDivisionResponse } from "../models/division";
+import { DivisionCreateRequest, DivisionResponse, toDivisionResponse, toDivisionResponseGetAll } from "../models/division";
 
 export class DivisionService {
   static async createDivision(request: DivisionCreateRequest): Promise<DivisionResponse> {
@@ -26,5 +26,15 @@ export class DivisionService {
     });
 
     return toDivisionResponse(division);
+  }
+
+  static async getAllDivision(): Promise<DivisionResponse[]> {
+    const division = await prisma.division.findMany();
+
+    if (!division) {
+      throw new ResponseError(400, "There is no division created");
+    }
+
+    return toDivisionResponseGetAll(division);
   }
 }

@@ -17,4 +17,18 @@ export class DivisionController {
       next(error);
     }
   }
+
+  static async getAllDivision(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await DivisionService.getAllDivision();
+
+      res.status(201).json({
+        code: 201,
+        message: "Success get all division",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
