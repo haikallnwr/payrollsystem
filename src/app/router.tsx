@@ -4,6 +4,9 @@ import { AuthLayout } from "@/layouts/AuthLayout";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
+import { EmployeePage } from "@/features/employee";
+import { DivisionPage } from "@/features/division";
+import { JobPositionPage } from "@/features/job-position";
 
 export const router = createBrowserRouter([
   {
@@ -33,15 +36,15 @@ export const router = createBrowserRouter([
           },
           {
             path: "employees",
-            element: <div className="p-6 font-medium text-slate-500">Employee Directory Page (Scaffold ready)</div>,
+            element: <EmployeePage />,
           },
           {
             path: "divisions",
-            element: <div className="p-6 font-medium text-slate-500">Divisions Page (Scaffold ready)</div>,
+            element: <DivisionPage />,
           },
           {
             path: "job-positions",
-            element: <div className="p-6 font-medium text-slate-500">Job Positions Page (Scaffold ready)</div>,
+            element: <JobPositionPage />,
           },
           {
             path: "reimbursements",
