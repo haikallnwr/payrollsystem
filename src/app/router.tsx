@@ -9,6 +9,7 @@ import { DivisionPage } from "@/features/division";
 import { JobPositionPage } from "@/features/job-position";
 import { ReimbursementPage } from "@/features/reimbursement";
 import { OvertimePage } from "@/features/overtime";
+import { PayrollPage } from "@/features/payroll";
 
 export const router = createBrowserRouter([
   {
@@ -58,7 +59,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "payrolls",
-            element: <div className="p-6 font-medium text-slate-500">Payrolls Processing Page (Scaffold ready)</div>,
+            element: <PayrollPage />,
           },
           {
             path: "profile",

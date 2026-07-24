@@ -144,7 +144,7 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+      <div className="p-3 mb-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
         <div className={cn("flex items-center justify-between", collapsed ? "flex-col gap-2" : "")}>
           <div className="flex items-center space-x-3 overflow-hidden">
             <Avatar className="h-9 w-9 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold text-xs shrink-0">
