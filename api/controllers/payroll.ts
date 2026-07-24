@@ -1,15 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
+import type { TokenPayload } from "../middleware/jwt";
 import { PayrollGenerateRequest } from "../models/payroll";
 import { PayrollService } from "../services/payroll";
-import { getDetailToken } from "../middleware/jwt";
 
 export class PayrollController {
+ 
   static async generatePayroll(req: Request, res: Response, next: NextFunction) {
     try {
-      const header = req.headers.authorization ?? "";
-      const decode = await getDetailToken(header);
+      const user = res.locals.user as TokenPayload;
       const request = req.body as PayrollGenerateRequest;
-      const result = await PayrollService.generatePayroll(decode.id, request);
+      const result = await PayrollService.generatePayroll(user.id, request);
 
       res.status(201).json({
         code: 201,

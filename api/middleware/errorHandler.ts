@@ -1,9 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { ResponseError } from "../lib/error";
 import { ZodError } from "zod";
-import jwt from "jsonwebtoken";
-import { getDetailToken } from "./jwt";
 
+/**
+ * Global error-handling middleware.
+ *
+ * Catches thrown errors and maps them to consistent JSON responses.
+ * Sensitive stack traces are never exposed to the client.
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   if (err instanceof ResponseError) {
@@ -28,6 +32,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     return;
   }
 
+  // Log full error for debugging — never send it to the client.
   console.error("Unhandled error:", err);
 
   res.status(500).json({
@@ -35,53 +40,3 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     message: "Internal server error",
   });
 }
-
-export const verifyJsonWebToken = async (req: Request, res: Response, next: NextFunction) => {
-  const header = req.headers.authorization;
-  if (header === null) {
-    return res.status(401).json({
-      code: 401,
-      message: "Unauthorized Access",
-    });
-  }
-
-  jwt.verify(header ?? "", process.env.APP_SECRET ?? "", (err) => {
-    if (err) {
-      return res.status(403).json({
-        code: 401,
-        message: "Forbidden, token invalid",
-      });
-    }
-
-    next();
-  });
-};
-
-export const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const header = req.headers.authorization;
-  if (header == null) {
-    return res.status(401).json({
-      code: 401,
-      message: "Unauthorized Access",
-    });
-  }
-
-  jwt.verify(header ?? "", process.env.APP_SECRET ?? "", (err) => {
-    if (err) {
-      return res.status(403).json({
-        code: 401,
-        message: "Forbidden, token invalid",
-      });
-    }
-  });
-
-  const decode = await getDetailToken(header);
-  if (decode.role !== "ADMIN" && decode.role !== "HR") {
-    return res.status(403).json({
-      code: 401,
-      message: "You dont have access",
-    });
-  }
-
-  next();
-};

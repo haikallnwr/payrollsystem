@@ -1,15 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
+import type { TokenPayload } from "../middleware/jwt";
 import { OvertimeCreateRequest } from "../models/overtime";
 import { OvertimeService } from "../services/overtime";
-import { getDetailToken } from "../middleware/jwt";
 
 export class OvertimeController {
+ 
   static async createOvertime(req: Request, res: Response, next: NextFunction) {
     try {
-      const header = req.headers.authorization ?? "";
-      const decode = await getDetailToken(header);
+      const user = res.locals.user as TokenPayload;
       const request = req.body as OvertimeCreateRequest;
-      const result = await OvertimeService.createOvertime(decode.id, request);
+      const result = await OvertimeService.createOvertime(user.id, request);
 
       res.status(201).json({
         code: 201,
