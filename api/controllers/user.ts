@@ -1,7 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import type { UserLoginRequest, UserRegisterRequest } from "../models/user";
-import { generateToken, getDetailToken } from "../middleware/jwt";
+import type { TokenPayload } from "../middleware/jwt";
+import { generateToken } from "../middleware/jwt";
 import { UserService } from "../services/user";
+import { getTokenCookieOptions, TOKEN_COOKIE_NAME } from "../lib/cookie";
 
 export class UserController {
   static async userRegister(req: Request, res: Response, next: NextFunction) {
@@ -24,23 +26,24 @@ export class UserController {
       const request = req.body as UserLoginRequest;
       const result = await UserService.userLogin(request);
 
-      const token = await generateToken(result);
+      const token = generateToken(result);
+
+      res.cookie(TOKEN_COOKIE_NAME, token, getTokenCookieOptions());
 
       res.status(200).json({
         code: 200,
         message: "Log in successfull",
-        data: token,
       });
     } catch (error) {
       next(error);
     }
   }
 
+  
   static async getMe(req: Request, res: Response, next: NextFunction) {
     try {
-      const header = req.headers.authorization as string;
-      const token = await getDetailToken(header);
-      const result = await UserService.getMe(token.email);
+      const user = res.locals.user as TokenPayload;
+      const result = await UserService.getMe(user.email);
 
       res.status(200).json({
         code: 200,
@@ -60,6 +63,20 @@ export class UserController {
         code: 200,
         message: "Success get all user",
         data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+ 
+  static async userLogout(_req: Request, res: Response, next: NextFunction) {
+    try {
+      res.clearCookie(TOKEN_COOKIE_NAME, getTokenCookieOptions());
+
+      res.status(200).json({
+        code: 200,
+        message: "Logged out successfully",
       });
     } catch (error) {
       next(error);

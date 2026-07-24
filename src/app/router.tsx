@@ -1,0 +1,66 @@
+import { createBrowserRouter, Navigate } from "react-router";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { AuthLayout } from "@/layouts/AuthLayout";
+import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
+
+export const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "",
+        element: <LoginPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/dashboard" replace />,
+          },
+          {
+            path: "dashboard",
+            element: <DashboardPage />,
+          },
+          {
+            path: "employees",
+            element: <div className="p-6 font-medium text-slate-500">Employee Directory Page (Scaffold ready)</div>,
+          },
+          {
+            path: "divisions",
+            element: <div className="p-6 font-medium text-slate-500">Divisions Page (Scaffold ready)</div>,
+          },
+          {
+            path: "job-positions",
+            element: <div className="p-6 font-medium text-slate-500">Job Positions Page (Scaffold ready)</div>,
+          },
+          {
+            path: "reimbursements",
+            element: <div className="p-6 font-medium text-slate-500 font-sans">Reimbursements Claims Page (Scaffold ready)</div>,
+          },
+          {
+            path: "overtimes",
+            element: <div className="p-6 font-medium text-slate-500">Overtimes Log Page (Scaffold ready)</div>,
+          },
+          {
+            path: "payrolls",
+            element: <div className="p-6 font-medium text-slate-500">Payrolls Processing Page (Scaffold ready)</div>,
+          },
+          {
+            path: "profile",
+            element: <div className="p-6 font-medium text-slate-500">User Profile Settings Page (Scaffold ready)</div>,
+          },
+        ],
+      },
+    ],
+  },
+]);

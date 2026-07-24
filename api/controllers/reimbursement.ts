@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
+import type { TokenPayload } from "../middleware/jwt";
 import { ReimbursementCreateRequest, ReimbursementApproveRequest } from "../models/reimbursement";
 import { ReimbursementService } from "../services/reimbursement";
-import { getDetailToken } from "../middleware/jwt";
 
 export class ReimbursementController {
   static async createReimbursement(req: Request, res: Response, next: NextFunction) {
@@ -48,13 +48,13 @@ export class ReimbursementController {
     }
   }
 
+ 
   static async approveReimbursement(req: Request, res: Response, next: NextFunction) {
     try {
       const id = Number(req.params.id);
-      const header = req.headers.authorization ?? "";
-      const decode = await getDetailToken(header);
+      const user = res.locals.user as TokenPayload;
       const request = req.body as ReimbursementApproveRequest;
-      const result = await ReimbursementService.approveReimbursement(id, decode.id, request);
+      const result = await ReimbursementService.approveReimbursement(id, user.id, request);
 
       res.status(200).json({
         code: 200,
