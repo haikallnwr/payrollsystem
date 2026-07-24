@@ -7,6 +7,7 @@ import { jobPositionRouter } from "./routes/jobPosition";
 import { employeeRouter } from "./routes/employee";
 import { reimbursementRouter } from "./routes/reimbursement";
 import { overtimeRouter } from "./routes/overtime";
+import { payrollRouter } from "./routes/payroll";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/api/jobPosition", jobPositionRouter);
 app.use("/api/employees", employeeRouter);
 app.use("/api/reimbursements", reimbursementRouter);
 app.use("/api/overtimes", overtimeRouter);
+app.use("/api/payrolls", payrollRouter);
 
 app.use(errorHandler);
 

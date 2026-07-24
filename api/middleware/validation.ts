@@ -124,7 +124,9 @@ export class UseValidation {
     employee_id: z.number().int().positive(),
     month: z.number().int().min(1).max(12),
     year: z.number().int().min(2000),
+    tax_percentage: z.number().min(0).max(100),
     other_deduction: z.number().min(0).optional(),
+    other_deduction_note: z.string().trim().max(255).optional(),
   });
 
   static readonly PAYROLL_UPDATE: ZodType = z.object({
