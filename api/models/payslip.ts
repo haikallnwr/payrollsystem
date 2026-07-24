@@ -39,6 +39,10 @@ export function toPayslipResponse(payload: payslipPayload): PayslipResponse {
   };
 }
 
+export function toPayslipResponseGetAll(payloads: payslipPayload[]): PayslipResponse[] {
+  return payloads.map(toPayslipResponse);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateSlipNumber(tx: any, month: number, year: number): Promise<string> {
   const prefix = `SLIP-${year}${month.toString().padStart(2, "0")}`;

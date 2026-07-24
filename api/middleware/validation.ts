@@ -133,4 +133,10 @@ export class UseValidation {
     status: z.enum(Object.values(PayrollStatus) as [PayrollStatus, ...PayrollStatus[]]).optional(),
     other_deduction: z.number().min(0).optional(),
   });
+
+  // ========================= PAYSLIP =========================
+
+  static readonly PAYSLIP_CREATE: ZodType = z.object({
+    payroll_id: z.number().int().positive(),
+  });
 }
