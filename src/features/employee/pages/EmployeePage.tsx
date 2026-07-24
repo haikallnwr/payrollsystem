@@ -5,6 +5,7 @@ import { EmployeeTable } from "../components/EmployeeTable";
 import { EmployeeFilter } from "../components/EmployeeFilter";
 import { EmployeeFormDialog } from "../components/EmployeeFormDialog";
 import { EmployeeStatusDialog } from "../components/EmployeeStatusDialog";
+import { UserFormDialog } from "@/features/user/components/UserFormDialog";
 import { Button } from "@/components/ui/button";
 import { UserPlus, Users, UserCheck, UserX } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
@@ -19,6 +20,7 @@ export function EmployeePage() {
   // Dialog States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [isUserFormOpen, setIsUserFormOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   // Filtered employees list
@@ -61,6 +63,11 @@ export function EmployeePage() {
   const handleChangeStatus = (employee: Employee) => {
     setSelectedEmployee(employee);
     setIsStatusOpen(true);
+  };
+
+  const handleCreateUserAccount = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsUserFormOpen(true);
   };
 
   const canManage = user?.role === "ADMIN" || user?.role === "HR";
@@ -136,6 +143,7 @@ export function EmployeePage() {
         isLoading={isLoading}
         onEdit={handleEdit}
         onChangeStatus={handleChangeStatus}
+        onCreateUserAccount={canManage ? handleCreateUserAccount : undefined}
       />
 
       {/* Modals */}
@@ -149,6 +157,12 @@ export function EmployeePage() {
         open={isStatusOpen}
         onOpenChange={setIsStatusOpen}
         employee={selectedEmployee}
+      />
+
+      <UserFormDialog
+        open={isUserFormOpen}
+        onOpenChange={setIsUserFormOpen}
+        defaultEmployeeId={selectedEmployee?.id}
       />
     </div>
   );

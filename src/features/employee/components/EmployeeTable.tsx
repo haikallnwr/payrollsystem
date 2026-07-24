@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, RefreshCw, User } from "lucide-react";
+import { MoreHorizontal, Edit, RefreshCw, User, ShieldCheck } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface EmployeeTableProps {
@@ -24,6 +24,7 @@ interface EmployeeTableProps {
   isLoading: boolean;
   onEdit: (employee: Employee) => void;
   onChangeStatus: (employee: Employee) => void;
+  onCreateUserAccount?: (employee: Employee) => void;
 }
 
 export function EmployeeTable({
@@ -31,6 +32,7 @@ export function EmployeeTable({
   isLoading,
   onEdit,
   onChangeStatus,
+  onCreateUserAccount,
 }: EmployeeTableProps) {
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -144,6 +146,12 @@ export function EmployeeTable({
                       <RefreshCw className="w-3.5 h-3.5 mr-2 text-slate-500" />
                       <span>Change Status</span>
                     </DropdownMenuItem>
+                    {onCreateUserAccount && (
+                      <DropdownMenuItem onClick={() => onCreateUserAccount(emp)}>
+                        <ShieldCheck className="w-3.5 h-3.5 mr-2 text-blue-600" />
+                        <span>Create User Account</span>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

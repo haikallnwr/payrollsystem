@@ -11,6 +11,8 @@ import { ReimbursementPage } from "@/features/reimbursement";
 import { OvertimePage } from "@/features/overtime";
 import { PayrollPage } from "@/features/payroll";
 
+import { UserPage } from "@/features/user";
+
 export const router = createBrowserRouter([
   {
     path: "/login",
@@ -36,6 +38,10 @@ export const router = createBrowserRouter([
           {
             path: "dashboard",
             element: <DashboardPage />,
+          },
+          {
+            path: "users",
+            element: <UserPage />,
           },
           {
             path: "employees",

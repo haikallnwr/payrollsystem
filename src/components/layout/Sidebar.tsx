@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  UserCog,
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ const mainNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
+  { title: "Users", href: "/users", icon: UserCog },
   { title: "Employees", href: "/employees", icon: Users },
   { title: "Divisions", href: "/divisions", icon: Building2 },
   { title: "Job Positions", href: "/job-positions", icon: Briefcase },

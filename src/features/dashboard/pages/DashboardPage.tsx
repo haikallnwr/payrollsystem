@@ -1,14 +1,5 @@
 import { useAuth } from "@/providers/auth-provider";
-import {
-  Users,
-  Banknote,
-  Receipt,
-  Clock,
-  ArrowUpRight,
-  Plus,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
+import { Users, Banknote, Receipt, Clock, ArrowUpRight, Plus, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,30 +46,19 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl text-white shadow-lg shadow-blue-500/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl text-white shadow-lg shadow-blue-500/10">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
-              Overview
-            </span>
-            <span className="text-xs text-blue-100">
-              {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Overview</span>
+            <span className="text-xs text-blue-100">{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">
-            Welcome back, {userName}!
-          </h1>
-          <p className="text-sm text-blue-100 mt-1 max-w-xl">
-            Here is the current payroll & employee summary for your organization.
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">Welcome back, {userName}!</h1>
+          <p className="text-sm text-blue-100 mt-1 max-w-xl">Here is the current payroll & employee summary for your organization.</p>
         </div>
 
         <div className="flex items-center space-x-3">
           {(user?.role === "ADMIN" || user?.role === "HR") && (
-            <Button
-              onClick={() => navigate("/payrolls")}
-              className="bg-white text-blue-600 hover:bg-blue-50 font-semibold shadow-sm"
-            >
+            <Button onClick={() => navigate("/payrolls")} className="bg-white text-blue-600 hover:bg-blue-50 font-semibold shadow-sm">
               <Plus className="w-4 h-4 mr-1.5" />
               Generate Payroll
             </Button>
@@ -94,21 +74,15 @@ export function DashboardPage() {
             <Card key={i} className="border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    {stat.title}
-                  </span>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{stat.title}</span>
                   <div className={`p-2.5 rounded-xl ${stat.color}`}>
                     <Icon className="w-5 h-5" />
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-                    {stat.value}
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center">
-                    {stat.change}
-                  </p>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-50">{stat.value}</div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center">{stat.change}</p>
                 </div>
               </CardContent>
             </Card>
@@ -126,12 +100,7 @@ export function DashboardPage() {
                 <CardTitle className="text-lg font-bold">Payroll Status</CardTitle>
                 <CardDescription>Recent payroll run summaries</CardDescription>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/payrolls")}
-                className="text-xs"
-              >
+              <Button variant="outline" size="sm" onClick={() => navigate("/payrolls")} className="text-xs">
                 View All
                 <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
               </Button>
@@ -144,15 +113,11 @@ export function DashboardPage() {
                       <CheckCircle2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        June 2026 Payroll
-                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">June 2026 Payroll</p>
                       <p className="text-xs text-slate-500">140 Employees • Rp 842.000.000</p>
                     </div>
                   </div>
-                  <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100">
-                    PAID
-                  </Badge>
+                  <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100">PAID</Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
@@ -161,9 +126,7 @@ export function DashboardPage() {
                       <AlertCircle className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        July 2026 Payroll
-                      </p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">July 2026 Payroll</p>
                       <p className="text-xs text-slate-500">142 Employees • Drafting</p>
                     </div>
                   </div>
@@ -184,11 +147,7 @@ export function DashboardPage() {
               <CardDescription>Shortcuts to key system functions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <button
-                type="button"
-                onClick={() => navigate("/employees")}
-                className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800"
-              >
+              <button type="button" onClick={() => navigate("/employees")} className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-3">
                   <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span className="text-sm font-medium">Employee Directory</span>
@@ -196,11 +155,7 @@ export function DashboardPage() {
                 <ArrowUpRight className="w-4 h-4 text-slate-400" />
               </button>
 
-              <button
-                type="button"
-                onClick={() => navigate("/reimbursements")}
-                className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800"
-              >
+              <button type="button" onClick={() => navigate("/reimbursements")} className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-3">
                   <Receipt className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   <span className="text-sm font-medium">Claim Reimbursement</span>
@@ -208,11 +163,7 @@ export function DashboardPage() {
                 <ArrowUpRight className="w-4 h-4 text-slate-400" />
               </button>
 
-              <button
-                type="button"
-                onClick={() => navigate("/overtimes")}
-                className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800"
-              >
+              <button type="button" onClick={() => navigate("/overtimes")} className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center space-x-3">
                   <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                   <span className="text-sm font-medium">Log Overtime</span>
