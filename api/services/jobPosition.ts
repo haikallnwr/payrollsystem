@@ -47,7 +47,6 @@ export class JobPositionService {
         level: updateValidate.level,
         default_salary: updateValidate.default_salary,
         description: updateValidate.description,
-        is_deleted: updateValidate.is_deleted,
       },
       include: {
         division: true,

@@ -34,7 +34,6 @@ export type UserUpdateRoleRequest = {
   email?: string;
   password?: string;
   role?: RoleUser;
-  is_deleted?: boolean;
 };
 
 export type UserResponse = {

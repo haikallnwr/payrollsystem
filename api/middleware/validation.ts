@@ -97,7 +97,10 @@ export class UseValidation {
     description: z.string().trim().max(500).optional(),
     amount: z.number().positive().optional(),
     proof_file: z.string().trim().optional(),
-    status: z.enum(Object.values(ReimbursementStatus) as [ReimbursementStatus, ...ReimbursementStatus[]]).optional(),
+  });
+
+  static readonly REIMBURSEMENT_APPROVE: ZodType = z.object({
+    status: z.enum(Object.values(ReimbursementStatus) as [ReimbursementStatus, ...ReimbursementStatus[]]),
   });
 
   // ========================= OVERTIME =========================

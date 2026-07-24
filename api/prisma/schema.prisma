@@ -139,27 +139,29 @@ model Overtime {
 }
 
 model Payroll {
-  id                  Int             @id @default(autoincrement())
-  employee_id         Int
-  month               Int
-  year                Int
-  basic_salary        Decimal         @db.Decimal(15, 2)
-  overtime_total      Decimal         @db.Decimal(15, 2)
-  reimbursement_total Decimal         @db.Decimal(15, 2)
-  tax                 Decimal         @db.Decimal(15, 2)
-  other_deduction     Decimal         @default(0) @db.Decimal(15, 2)
-  gross_salary        Decimal         @db.Decimal(15, 2)
-  net_salary          Decimal         @db.Decimal(15, 2)
-  status              PayrollStatus   @default(DRAFT)
-  generated_by        Int
-  generated_at        DateTime        @default(now())
-  created_at          DateTime        @default(now())
-  updated_at          DateTime        @updatedAt
-  employee            Employee        @relation(fields: [employee_id], references: [id])
-  generator           User            @relation(fields: [generated_by], references: [id])
-  payslip             Payslip?
-  overtimes           Overtime[]
-  reimbursements      Reimbursement[]
+  id                   Int             @id @default(autoincrement())
+  employee_id          Int
+  month                Int
+  year                 Int
+  basic_salary         Decimal         @db.Decimal(15, 2)
+  overtime_total       Decimal         @db.Decimal(15, 2)
+  reimbursement_total  Decimal         @db.Decimal(15, 2)
+  tax_percentage       Decimal         @db.Decimal(5, 2)
+  tax                  Decimal         @db.Decimal(15, 2)
+  other_deduction      Decimal         @default(0) @db.Decimal(15, 2)
+  other_deduction_note String?
+  gross_salary         Decimal         @db.Decimal(15, 2)
+  net_salary           Decimal         @db.Decimal(15, 2)
+  status               PayrollStatus   @default(DRAFT)
+  generated_by         Int
+  generated_at         DateTime        @default(now())
+  created_at           DateTime        @default(now())
+  updated_at           DateTime        @updatedAt
+  employee             Employee        @relation(fields: [employee_id], references: [id])
+  generator            User            @relation(fields: [generated_by], references: [id])
+  payslip              Payslip?
+  overtimes            Overtime[]
+  reimbursements       Reimbursement[]
 
   @@unique([employee_id, month, year])
   @@index([status])

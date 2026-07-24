@@ -25,7 +25,6 @@ export type JobPositionUpdateRequest = {
   level?: JobLevel;
   default_salary?: number;
   description?: string;
-  is_deleted?: boolean;
 };
 
 export type JobPositionResponse = {

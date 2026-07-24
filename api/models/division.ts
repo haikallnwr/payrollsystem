@@ -8,7 +8,6 @@ export type DivisionCreateRequest = {
 export type DivisionUpdateRequest = {
   name?: string;
   description?: string;
-  is_deleted?: boolean;
 };
 
 export type DivisionResponse = {
