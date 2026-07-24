@@ -7,6 +7,8 @@ import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
 import { EmployeePage } from "@/features/employee";
 import { DivisionPage } from "@/features/division";
 import { JobPositionPage } from "@/features/job-position";
+import { ReimbursementPage } from "@/features/reimbursement";
+import { OvertimePage } from "@/features/overtime";
 
 export const router = createBrowserRouter([
   {
@@ -48,11 +50,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "reimbursements",
-            element: <div className="p-6 font-medium text-slate-500 font-sans">Reimbursements Claims Page (Scaffold ready)</div>,
+            element: <ReimbursementPage />,
           },
           {
             path: "overtimes",
-            element: <div className="p-6 font-medium text-slate-500">Overtimes Log Page (Scaffold ready)</div>,
+            element: <OvertimePage />,
           },
           {
             path: "payrolls",
