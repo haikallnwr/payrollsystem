@@ -71,34 +71,30 @@ lsp-payrollsystem/
 
 ---
 
-### Langkah 1: Install Dependensi
+### Langkah 1: Clone Repository dan Install Dependensi
 
-Buka terminal dan jalankan perintah berikut untuk menginstall dependensi di folder utama dan folder `api`:
+Buka terminal dan jalankan perintah berikut:
 
 ```bash
-# Install dependensi frontend
-npm install
+# Clone repository
+git clone https://github.com/haikallnwr/payrollsystem.git
+cd payrollsystem
 
-# Masuk ke folder backend dan install dependensi
-cd api
+# Install dependensi frontend dan backend
 npm install
+cd api && npm install && cd ..
 ```
 
 ---
 
 ### Langkah 2: Konfigurasi Environment Variable
 
-Buat file `.env` di dalam folder `api/` dan isi sesuai dengan konfigurasi database MySQL kamu:
+Buat file `.env` di dalam folder `api/` dengan isi minimal berikut:
 
 ```env
 PORT=5000
-SECRET_KEY=payroll_jwt_secret_key_2026
+SECRET_KEY=secret_key_jwt_kamu
 
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_USER=root
-DATABASE_PASSWORD=password_mysql_kamu
-DATABASE_NAME=lsp_payrollsystem
 DATABASE_URL="mysql://root:password_mysql_kamu@localhost:3306/lsp_payrollsystem"
 
 APP_EMAIL=admin@company.com
@@ -109,7 +105,7 @@ APP_PASSWORD=Password123!
 
 ### Langkah 3: Membuat Tabel Database dan Data Awal
 
-Jalankan perintah berikut di dalam folder `api/` untuk membuat struktur tabel di MySQL dan mengisi data akun awal Admin:
+Jalankan perintah berikut di dalam folder `api/` untuk membuat struktur tabel di MySQL dan meng-seed data awal Admin:
 
 ```bash
 cd api
@@ -119,39 +115,34 @@ npx prisma db push
 
 # Isi data awal akun Admin (admin@company.com)
 npm run seed
+
+cd ..
 ```
 
 ---
 
 ### Langkah 4: Menjalankan Aplikasi
 
-Buka dua jendela terminal terpisah untuk menjalankan backend dan frontend:
+Cukup jalankan satu perintah berikut di root folder proyek untuk menjalankan frontend dan backend secara bersamaan:
 
-1. **Terminal 1 (Backend):**
-   ```bash
-   cd api
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
-2. **Terminal 2 (Frontend):**
-   ```bash
-   npm run dev
-   ```
-
-Aplikasi dapat diakses melalui browser di alamat `http://localhost:5173`.
+Aplikasi akan otomatis berjalan di:
+- **Frontend**: `http://localhost:5173`
+- **Backend**: `http://localhost:5000`
 
 ---
 
 ## Cara Menjalankan Pengujian Otomatis
 
-Untuk memastikan semua fitur backend berfungsi tanpa kendala, jalankan perintah pengujian berikut di dalam folder `api`:
+Untuk menjalankan suite pengujian backend (28 skenario tes):
 
 ```bash
 cd api
 npm test
 ```
-
-Pengujian ini mencakup 28 skenario untuk modul login, pengelolaan divisi, data karyawan, pengajuan lembur, klaim reimbursement, dan kalkulasi gaji.
 
 ---
 
