@@ -15,15 +15,6 @@ import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 
-// ---------------------------------------------------------------------------
-// Security middleware
-// ---------------------------------------------------------------------------
-
-/**
- * CORS — locked to the explicit frontend origin.
- * `credentials: true` is required for the browser to send/receive HttpOnly cookies.
- * A wildcard origin ("*") would silently prevent cookies from working.
- */
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
@@ -31,15 +22,13 @@ app.use(
   }),
 );
 
-/** Parse JSON bodies. */
+
 app.use(express.json());
 
-/** Parse cookies so `req.cookies` is populated for auth middleware. */
+
 app.use(cookieParser());
 
-// ---------------------------------------------------------------------------
-// Routes
-// ---------------------------------------------------------------------------
+
 
 app.use("/api/users", userRouter);
 app.use("/api/divisions", divisionRouter);
@@ -51,18 +40,11 @@ app.use("/api/payrolls", payrollRouter);
 app.use("/api/payslips", payslipRouter);
 app.use("/api/dashboard", dashboardRouter);
 
-// ---------------------------------------------------------------------------
-// Error handling (must be registered after routes)
-// ---------------------------------------------------------------------------
+
 
 app.use(errorHandler);
 
-// ---------------------------------------------------------------------------
-// Start server
-// ---------------------------------------------------------------------------
 
-const PORT = process.env.APP_PORT;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+export { app };
+export default app;

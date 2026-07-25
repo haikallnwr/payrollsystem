@@ -13,6 +13,17 @@ export function DivisionPage() {
   const { data: divisions = [], isLoading } = useDivisionsQuery();
   const deleteMutation = useDeleteDivisionMutation();
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedDivision, setSelectedDivision] = useState<Division | null>(null);
+
+  const handleCreate = () => {
+    setSelectedDivision(null);
+    setIsOpen(true);
+  };
+
+  const handleEdit = (division: Division) => {
+    setSelectedDivision(division);
+    setIsOpen(true);
+  };
 
   const handleDelete = (division: Division) => {
     deleteMutation.mutate(division.id);
@@ -35,7 +46,7 @@ export function DivisionPage() {
 
         {canManage && (
           <Button
-            onClick={() => setIsOpen(true)}
+            onClick={handleCreate}
             className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium rounded-full shadow-sm shrink-0"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -48,11 +59,16 @@ export function DivisionPage() {
       <DivisionTable
         divisions={divisions}
         isLoading={isLoading}
+        onEdit={canManage ? handleEdit : undefined}
         onDelete={user?.role === "ADMIN" ? handleDelete : undefined}
       />
 
-      {/* Create Dialog */}
-      <DivisionFormDialog open={isOpen} onOpenChange={setIsOpen} />
+      {/* Form Dialog (Create & Edit) */}
+      <DivisionFormDialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        division={selectedDivision}
+      />
     </div>
   );
 }

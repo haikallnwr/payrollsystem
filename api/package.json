@@ -5,8 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch app.ts"
+    "dev": "tsx watch index.ts",
+    "seed": "tsx prisma/seed.ts",
+    "test": "vitest run --fileParallelism=false",
+    "test:watch": "vitest --fileParallelism=false",
+    "test:coverage": "vitest run --coverage --fileParallelism=false"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 import type { ApiResponse } from "@/types/api.type";
-import type { Division, DivisionCreateInput } from "../division.type";
+import type { Division, DivisionCreateInput, DivisionUpdateInput } from "../division.type";
 
 export const DivisionApi = {
   getAll: async (): Promise<ApiResponse<Division[]>> => {
@@ -10,6 +10,11 @@ export const DivisionApi = {
 
   create: async (data: DivisionCreateInput): Promise<ApiResponse<Division>> => {
     const response = await axiosInstance.post<ApiResponse<Division>>("/divisions/create", data);
+    return response.data;
+  },
+
+  update: async (id: number, data: DivisionUpdateInput): Promise<ApiResponse<Division>> => {
+    const response = await axiosInstance.put<ApiResponse<Division>>(`/divisions/update/${id}`, data);
     return response.data;
   },
 

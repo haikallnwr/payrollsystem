@@ -17,16 +17,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Building2, Trash2 } from "lucide-react";
+import { Building2, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DivisionTableProps {
   divisions: Division[];
   isLoading: boolean;
+  onEdit?: (division: Division) => void;
   onDelete?: (division: Division) => void;
 }
 
-export function DivisionTable({ divisions, isLoading, onDelete }: DivisionTableProps) {
+export function DivisionTable({ divisions, isLoading, onEdit, onDelete }: DivisionTableProps) {
   const [divisionToDelete, setDivisionToDelete] = useState<Division | null>(null);
 
   if (isLoading) {
@@ -76,16 +85,34 @@ export function DivisionTable({ divisions, isLoading, onDelete }: DivisionTableP
                   {div.description || "No description provided."}
                 </TableCell>
                 <TableCell className="text-right">
-                  {onDelete && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDivisionToDelete(div)}
-                      className="text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-                      title="Delete Division"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  {(onEdit || onDelete) && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {onEdit && (
+                          <DropdownMenuItem onClick={() => onEdit(div)}>
+                            <Edit className="w-3.5 h-3.5 mr-2 text-slate-500" />
+                            <span>Edit Division</span>
+                          </DropdownMenuItem>
+                        )}
+                        {onDelete && (
+                          <>
+                            {onEdit && <DropdownMenuSeparator />}
+                            <DropdownMenuItem
+                              onClick={() => setDivisionToDelete(div)}
+                              className="text-rose-600 dark:text-rose-400 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/40"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-2" />
+                              <span>Delete Division</span>
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </TableCell>
               </TableRow>

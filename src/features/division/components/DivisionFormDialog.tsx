@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { divisionFormSchema, type DivisionFormData } from "../division.validation";
 import { useCreateDivisionMutation } from "../hooks/useCreateDivisionMutation";
+import { useUpdateDivisionMutation } from "../hooks/useUpdateDivisionMutation";
+import type { Division } from "../division.type";
 import {
   Dialog,
   DialogContent,
@@ -18,10 +21,13 @@ import { Loader2 } from "lucide-react";
 interface DivisionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  division?: Division | null;
 }
 
-export function DivisionFormDialog({ open, onOpenChange }: DivisionFormDialogProps) {
+export function DivisionFormDialog({ open, onOpenChange, division }: DivisionFormDialogProps) {
+  const isEditing = !!division;
   const createMutation = useCreateDivisionMutation();
+  const updateMutation = useUpdateDivisionMutation();
 
   const {
     register,
@@ -36,19 +42,46 @@ export function DivisionFormDialog({ open, onOpenChange }: DivisionFormDialogPro
     },
   });
 
+  useEffect(() => {
+    if (division) {
+      reset({
+        name: division.name,
+        description: division.description || "",
+      });
+    } else {
+      reset({
+        name: "",
+        description: "",
+      });
+    }
+  }, [division, reset, open]);
+
   const onSubmit = async (data: DivisionFormData) => {
-    await createMutation.mutateAsync(data);
+    if (isEditing && division) {
+      await updateMutation.mutateAsync({
+        id: division.id,
+        data,
+      });
+    } else {
+      await createMutation.mutateAsync(data);
+    }
     reset();
     onOpenChange(false);
   };
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-115">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Add New Division</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            {isEditing ? "Edit Division" : "Add New Division"}
+          </DialogTitle>
           <DialogDescription>
-            Create an organizational division (e.g. Engineering, Human Resources, Finance).
+            {isEditing
+              ? "Update organizational division details."
+              : "Create an organizational division (e.g. Engineering, Human Resources, Finance)."}
           </DialogDescription>
         </DialogHeader>
 
@@ -79,20 +112,22 @@ export function DivisionFormDialog({ open, onOpenChange }: DivisionFormDialogPro
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={createMutation.isPending}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={createMutation.isPending}
+              disabled={isSubmitting}
               className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium"
             >
-              {createMutation.isPending ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating...
+                  Saving...
                 </>
+              ) : isEditing ? (
+                "Update Division"
               ) : (
                 "Create Division"
               )}
