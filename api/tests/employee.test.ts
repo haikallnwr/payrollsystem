@@ -23,7 +23,7 @@ describe("Employee API Integration Tests", () => {
         .set("Cookie", cookieHeader)
         .send({
           division_id: divRes.body.data.id,
-          position_name: "Test Developer",
+          position_name: `Test Dev ${Date.now()}`,
           level: "JUNIOR",
           default_salary: 7000000,
         });

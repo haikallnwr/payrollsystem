@@ -2,7 +2,7 @@ import { prisma } from "../../lib/prisma";
 
 export async function clearDatabase() {
   try {
-    // Delete test payslips & payrolls
+    // 1. Delete test payslips
     await prisma.payslip.deleteMany({
       where: {
         payroll: {
@@ -13,38 +13,48 @@ export async function clearDatabase() {
       },
     });
 
+    // 2. Delete test payrolls (both by employee code AND by generator email)
     await prisma.payroll.deleteMany({
       where: {
-        employee: {
-          employee_code: { contains: "EMP-TEST" },
-        },
+        OR: [
+          { employee: { employee_code: { contains: "EMP-TEST" } } },
+          { generator: { email: { startsWith: "test." } } },
+          { generator: { email: { endsWith: "@example.com" } } },
+        ],
       },
     });
 
-    // Delete test overtimes & reimbursements
+    // 3. Delete test overtimes & reimbursements
     await prisma.overtime.deleteMany({
       where: {
-        notes: { contains: "test" },
+        OR: [
+          { employee: { employee_code: { contains: "EMP-TEST" } } },
+          { notes: { contains: "test" } },
+        ],
       },
     });
 
     await prisma.reimbursement.deleteMany({
       where: {
-        title: { contains: "Test" },
+        OR: [
+          { employee: { employee_code: { contains: "EMP-TEST" } } },
+          { title: { contains: "Test" } },
+        ],
       },
     });
 
-    // Delete test employees
+    // 4. Delete test employees
     await prisma.employee.deleteMany({
       where: {
         OR: [
           { employee_code: { contains: "EMP-TEST" } },
           { full_name: { contains: "Test" } },
+          { user: { email: { startsWith: "test." } } },
         ],
       },
     });
 
-    // Delete test users (starting with test. or example.com), keeping admin@company.com safe
+    // 5. Delete test users
     await prisma.user.deleteMany({
       where: {
         OR: [
@@ -58,13 +68,22 @@ export async function clearDatabase() {
       },
     });
 
-    // Delete test divisions
+    // 6. Delete test job positions & divisions
+    await prisma.jobPosition.deleteMany({
+      where: {
+        OR: [
+          { position_name: { startsWith: "Test" } },
+          { division: { name: { startsWith: "Test-Dept-" } } },
+        ],
+      },
+    });
+
     await prisma.division.deleteMany({
       where: {
         name: { startsWith: "Test-Dept-" },
       },
     });
   } catch (e) {
-    console.error("Database cleanup notice:", e);
+    // Ignore cleanup errors
   }
 }
