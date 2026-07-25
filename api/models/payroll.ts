@@ -20,6 +20,21 @@
     other_deduction_note?: string;
   };
 
+  export type BatchPayrollGenerateRequest = {
+    month: number;
+    year: number;
+    tax_percentage: number;
+    other_deduction?: number;
+    other_deduction_note?: string;
+  };
+
+  export type BatchPayrollResultResponse = {
+    processedCount: number;
+    createdCount: number;
+    skippedCount: number;
+    payrolls: PayrollResponse[];
+  };
+
   export type PayrollResponse = {
     id: number;
     employee_id: number;

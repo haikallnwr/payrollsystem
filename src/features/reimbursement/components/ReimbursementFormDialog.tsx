@@ -16,13 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
 interface ReimbursementFormDialogProps {
@@ -30,6 +23,8 @@ interface ReimbursementFormDialogProps {
   onOpenChange: (open: boolean) => void;
   reimbursement?: Reimbursement | null;
 }
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function ReimbursementFormDialog({
   open,
@@ -45,6 +40,7 @@ export function ReimbursementFormDialog({
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<ReimbursementFormData>({
@@ -57,6 +53,8 @@ export function ReimbursementFormDialog({
       proof_file: "",
     },
   });
+
+  const selectedEmployeeId = watch("employee_id");
 
   useEffect(() => {
     if (reimbursement) {
@@ -118,22 +116,18 @@ export function ReimbursementFormDialog({
             <Label htmlFor="employee_id" className="text-xs font-semibold">
               Employee *
             </Label>
-            <Select
+            <SearchableSelect
               disabled={isLoadingEmployees}
-              onValueChange={(val: string) => setValue("employee_id", Number(val))}
-              defaultValue={reimbursement ? String(reimbursement.employee_id) : undefined}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select employee..." />
-              </SelectTrigger>
-              <SelectContent>
-                {employees.map((emp) => (
-                  <SelectItem key={emp.id} value={String(emp.id)}>
-                    {emp.full_name} ({emp.employee_code}) — {emp.division_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={selectedEmployeeId}
+              onValueChange={(val) => setValue("employee_id", Number(val))}
+              placeholder="Search & select employee..."
+              searchPlaceholder="Search employee name, code, or division..."
+              options={employees.map((emp) => ({
+                value: emp.id,
+                label: `${emp.full_name} (${emp.employee_code})`,
+                sublabel: `${emp.position_name} — ${emp.division_name}`,
+              }))}
+            />
             {errors.employee_id && (
               <p className="text-xs text-red-500">{errors.employee_id.message}</p>
             )}

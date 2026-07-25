@@ -2,6 +2,7 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
+import type { TokenPayload } from "../middleware/jwt";
 import {
   OvertimeCreateRequest,
   OvertimeResponse,
@@ -12,15 +13,30 @@ import {
 const OVERTIME_RATE_PER_HOUR = 50000;
 
 export class OvertimeService {
-  static async createOvertime(createdByUserId: number, request: OvertimeCreateRequest): Promise<OvertimeResponse> {
+  static async createOvertime(currentUser: TokenPayload, request: OvertimeCreateRequest): Promise<OvertimeResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const createValidate = Validation.validate(UseValidation.OVERTIME_CREATE, request) as OvertimeCreateRequest;
 
-    const employee = await prisma.employee.findUnique({
+    const targetEmployee = await prisma.employee.findUnique({
       where: { id: createValidate.employee_id },
     });
 
-    if (!employee) {
+    if (!targetEmployee) {
       throw new ResponseError(404, "Employee not found");
+    }
+
+    // HR Self-Processing Rule: HR cannot create overtime for themselves
+    if (currentUser.role === "HR") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (userEmployee && userEmployee.id === createValidate.employee_id) {
+        throw new ResponseError(403, "You cannot process your own overtime.");
+      }
     }
 
     const amount = createValidate.hours * OVERTIME_RATE_PER_HOUR;
@@ -32,7 +48,7 @@ export class OvertimeService {
         hours: createValidate.hours,
         amount: amount,
         notes: createValidate.notes,
-        created_by: createdByUserId,
+        created_by: currentUser.id,
       },
       include: {
         employee: { select: { full_name: true, employee_code: true } },
@@ -43,22 +59,37 @@ export class OvertimeService {
     return toOvertimeResponse(overtime);
   }
 
-  static async getAllOvertime(): Promise<OvertimeResponse[]> {
+  static async getAllOvertime(currentUser: TokenPayload): Promise<OvertimeResponse[]> {
+    let whereClause = {};
+
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee) {
+        return [];
+      }
+
+      whereClause = { employee_id: userEmployee.id };
+    }
+
     const overtimes = await prisma.overtime.findMany({
+      where: whereClause,
       include: {
         employee: { select: { full_name: true, employee_code: true } },
         creator: { select: { email: true } },
       },
     });
 
-    if (!overtimes) {
-      throw new ResponseError(400, "There is no overtime created");
-    }
-
     return toOvertimeResponseGetAll(overtimes);
   }
 
-  static async updateOvertime(id: number, request: OvertimeCreateRequest): Promise<OvertimeResponse> {
+  static async updateOvertime(currentUser: TokenPayload, id: number, request: OvertimeCreateRequest): Promise<OvertimeResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const updateValidate = Validation.validate(UseValidation.OVERTIME_UPDATE, request) as OvertimeCreateRequest;
 
     const existing = await prisma.overtime.findUnique({
@@ -73,14 +104,25 @@ export class OvertimeService {
       throw new ResponseError(400, "Cannot update overtime that is already locked to a payroll");
     }
 
+    // HR Self-Processing Rule: HR cannot update their own overtime
+    if (currentUser.role === "HR") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (userEmployee && userEmployee.id === existing.employee_id) {
+        throw new ResponseError(403, "You cannot process your own overtime.");
+      }
+    }
+
     const hours = updateValidate.hours ?? existing.hours;
     const amount = hours * OVERTIME_RATE_PER_HOUR;
 
     const overtime = await prisma.overtime.update({
       where: { id: id },
       data: {
-        date: updateValidate.date,
-        hours: updateValidate.hours,
+        date: updateValidate.date || existing.date,
+        hours: hours,
         amount: amount,
         notes: updateValidate.notes,
       },
@@ -93,7 +135,11 @@ export class OvertimeService {
     return toOvertimeResponse(overtime);
   }
 
-  static async deleteOvertime(id: number): Promise<void> {
+  static async deleteOvertime(currentUser: TokenPayload, id: number): Promise<void> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const existing = await prisma.overtime.findUnique({
       where: { id: id },
     });
@@ -104,6 +150,17 @@ export class OvertimeService {
 
     if (existing.payroll_id !== null) {
       throw new ResponseError(400, "Cannot delete overtime that is already locked to a payroll");
+    }
+
+    // HR Self-Processing Rule: HR cannot delete their own overtime
+    if (currentUser.role === "HR") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (userEmployee && userEmployee.id === existing.employee_id) {
+        throw new ResponseError(403, "You cannot process your own overtime.");
+      }
     }
 
     await prisma.overtime.delete({

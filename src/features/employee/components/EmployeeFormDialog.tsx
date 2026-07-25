@@ -17,13 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
 interface EmployeeFormDialogProps {
@@ -31,6 +24,8 @@ interface EmployeeFormDialogProps {
   onOpenChange: (open: boolean) => void;
   employee?: Employee | null;
 }
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function EmployeeFormDialog({
   open,
@@ -46,6 +41,7 @@ export function EmployeeFormDialog({
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<EmployeeFormData>({
@@ -60,6 +56,8 @@ export function EmployeeFormDialog({
       bank_account: "",
     },
   });
+
+  const selectedPositionId = watch("job_position_id");
 
   useEffect(() => {
     if (employee) {
@@ -144,22 +142,18 @@ export function EmployeeFormDialog({
             <Label htmlFor="job_position_id" className="text-xs font-semibold">
               Job Position & Division *
             </Label>
-            <Select
+            <SearchableSelect
               disabled={isLoadingPositions}
-              onValueChange={(val: string) => setValue("job_position_id", Number(val))}
-              defaultValue={employee ? String(employee.job_position_id) : undefined}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select position..." />
-              </SelectTrigger>
-              <SelectContent>
-                {jobPositions.map((pos) => (
-                  <SelectItem key={pos.id} value={String(pos.id)}>
-                    {pos.position_name} ({pos.level}) — {pos.division_name || pos.division?.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={selectedPositionId}
+              onValueChange={(val) => setValue("job_position_id", Number(val))}
+              placeholder="Search & select position..."
+              searchPlaceholder="Search job position or division..."
+              options={jobPositions.map((pos) => ({
+                value: pos.id,
+                label: `${pos.position_name} (${pos.level})`,
+                sublabel: pos.division_name || pos.division?.name,
+              }))}
+            />
             {errors.job_position_id && (
               <p className="text-xs text-red-500">{errors.job_position_id.message}</p>
             )}

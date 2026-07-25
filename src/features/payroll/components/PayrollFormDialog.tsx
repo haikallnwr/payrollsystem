@@ -28,6 +28,8 @@ interface PayrollFormDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 export function PayrollFormDialog({ open, onOpenChange }: PayrollFormDialogProps) {
   const { data: employees = [], isLoading: isLoadingEmployees } = useEmployeesQuery();
   const generateMutation = useGeneratePayrollMutation();
@@ -40,6 +42,7 @@ export function PayrollFormDialog({ open, onOpenChange }: PayrollFormDialogProps
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<PayrollGenerateFormData>({
@@ -53,6 +56,8 @@ export function PayrollFormDialog({ open, onOpenChange }: PayrollFormDialogProps
       other_deduction_note: "",
     },
   });
+
+  const selectedEmployeeId = watch("employee_id");
 
   const onSubmit = async (data: PayrollGenerateFormData) => {
     const payload = {
@@ -100,23 +105,20 @@ export function PayrollFormDialog({ open, onOpenChange }: PayrollFormDialogProps
             <Label htmlFor="employee_id" className="text-xs font-semibold">
               Employee *
             </Label>
-            <Select
+            <SearchableSelect
               disabled={isLoadingEmployees}
-              onValueChange={(val: string) => setValue("employee_id", Number(val))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select employee..." />
-              </SelectTrigger>
-              <SelectContent>
-                {employees
-                  .filter((emp) => emp.employment_status === "ACTIVE")
-                  .map((emp) => (
-                    <SelectItem key={emp.id} value={String(emp.id)}>
-                      {emp.full_name} ({emp.employee_code}) — {emp.position_name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+              value={selectedEmployeeId}
+              onValueChange={(val) => setValue("employee_id", Number(val))}
+              placeholder="Search & select active employee..."
+              searchPlaceholder="Search employee name, code, or position..."
+              options={employees
+                .filter((emp) => emp.employment_status === "ACTIVE")
+                .map((emp) => ({
+                  value: emp.id,
+                  label: `${emp.full_name} (${emp.employee_code})`,
+                  sublabel: `${emp.position_name} — ${emp.division_name}`,
+                }))}
+            />
             {errors.employee_id && (
               <p className="text-xs text-red-500">{errors.employee_id.message}</p>
             )}

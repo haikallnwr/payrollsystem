@@ -5,4 +5,5 @@ export * from "./hooks/useEmployeesQuery";
 export * from "./hooks/useCreateEmployeeMutation";
 export * from "./hooks/useUpdateEmployeeMutation";
 export * from "./hooks/useUpdateEmployeeStatusMutation";
+export * from "./hooks/useDeleteEmployeeMutation";
 export * from "./pages/EmployeePage";

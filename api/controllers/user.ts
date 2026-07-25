@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type { UserLoginRequest, UserRegisterRequest } from "../models/user";
+import type { UserLoginRequest, UserRegisterRequest, UserUpdatePasswordRequest, UserUpdateRoleRequest } from "../models/user";
 import type { TokenPayload } from "../middleware/jwt";
 import { generateToken } from "../middleware/jwt";
 import { UserService } from "../services/user";
@@ -8,12 +8,13 @@ import { getTokenCookieOptions, TOKEN_COOKIE_NAME } from "../lib/cookie";
 export class UserController {
   static async userRegister(req: Request, res: Response, next: NextFunction) {
     try {
+      const user = res.locals.user as TokenPayload;
       const request = req.body as UserRegisterRequest;
-      const result = await UserService.userRegister(request);
+      const result = await UserService.userRegister(user, request);
 
       res.status(201).json({
         code: 201,
-        message: "Register successfull",
+        message: "User registered successfully",
         data: result,
       });
     } catch (error) {
@@ -32,15 +33,14 @@ export class UserController {
 
       res.status(200).json({
         code: 200,
-        message: "Log in successfull",
+        message: "Log in successful",
       });
     } catch (error) {
       next(error);
     }
   }
 
-  
-  static async getMe(req: Request, res: Response, next: NextFunction) {
+  static async getMe(_req: Request, res: Response, next: NextFunction) {
     try {
       const user = res.locals.user as TokenPayload;
       const result = await UserService.getMe(user.email);
@@ -55,13 +55,14 @@ export class UserController {
     }
   }
 
-  static async getAllUser(req: Request, res: Response, next: NextFunction) {
+  static async getAllUser(_req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await UserService.getAllUser();
+      const user = res.locals.user as TokenPayload;
+      const result = await UserService.getAllUser(user);
 
       res.status(200).json({
         code: 200,
-        message: "Success get all user",
+        message: "Success get all users",
         data: result,
       });
     } catch (error) {
@@ -69,7 +70,54 @@ export class UserController {
     }
   }
 
- 
+  static async updateOwnPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = res.locals.user as TokenPayload;
+      const request = req.body as UserUpdatePasswordRequest;
+      const result = await UserService.updateOwnPassword(user, request);
+
+      res.status(200).json({
+        code: 200,
+        message: "Password updated successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = res.locals.user as TokenPayload;
+      const id = Number(req.params.id);
+      const request = req.body as UserUpdateRoleRequest;
+      const result = await UserService.updateUser(user, id, request);
+
+      res.status(200).json({
+        code: 200,
+        message: "User updated successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = res.locals.user as TokenPayload;
+      const id = Number(req.params.id);
+      await UserService.deleteUser(user, id);
+
+      res.status(200).json({
+        code: 200,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async userLogout(_req: Request, res: Response, next: NextFunction) {
     try {
       res.clearCookie(TOKEN_COOKIE_NAME, getTokenCookieOptions());

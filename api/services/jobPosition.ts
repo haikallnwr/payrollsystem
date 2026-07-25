@@ -2,19 +2,31 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
-import { JobPositionCreateRequest, JobPositionResponse, JobPositionUpdateRequest, toJobPositionResponse, toJobPositionResponseGetAll } from "../models/jobPosition";
+import type { TokenPayload } from "../middleware/jwt";
+import {
+  JobPositionCreateRequest,
+  JobPositionResponse,
+  JobPositionUpdateRequest,
+  toJobPositionResponse,
+  toJobPositionResponseGetAll,
+} from "../models/jobPosition";
 
 export class JobPositionService {
-  static async jobPositionCreate(request: JobPositionCreateRequest): Promise<JobPositionResponse> {
+  static async jobPositionCreate(currentUser: TokenPayload, request: JobPositionCreateRequest): Promise<JobPositionResponse> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const createValidate = Validation.validate(UseValidation.JOB_POSITION_CREATE, request) as JobPositionCreateRequest;
-    const isJobPositionExist = prisma.jobPosition.count({
+    const count = await prisma.jobPosition.count({
       where: {
         position_name: createValidate.position_name,
         level: createValidate.level,
+        is_deleted: false,
       },
     });
 
-    if (!isJobPositionExist) {
+    if (count > 0) {
       throw new ResponseError(400, "Job Position already exists");
     }
 
@@ -34,8 +46,24 @@ export class JobPositionService {
     return toJobPositionResponse(jobPosition);
   }
 
-  static async jobPositionUpdate(id: number, request: JobPositionUpdateRequest): Promise<JobPositionResponse> {
+  static async jobPositionUpdate(
+    currentUser: TokenPayload,
+    id: number,
+    request: JobPositionUpdateRequest,
+  ): Promise<JobPositionResponse> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const updateValidate = Validation.validate(UseValidation.JOB_POSITION_UPDATE, request) as JobPositionUpdateRequest;
+
+    const existing = await prisma.jobPosition.findUnique({
+      where: { id: id },
+    });
+
+    if (!existing || existing.is_deleted) {
+      throw new ResponseError(404, "Job Position not found");
+    }
 
     const jobPosition = await prisma.jobPosition.update({
       where: {
@@ -53,23 +81,40 @@ export class JobPositionService {
       },
     });
 
-    if (!jobPosition) {
-      throw new ResponseError(400, "Invalid Request");
-    }
-
     return toJobPositionResponse(jobPosition);
   }
 
-  static async getAllJobPosition(): Promise<JobPositionResponse[]> {
-    const jobPosition = await prisma.jobPosition.findMany({
+  static async getAllJobPosition(_currentUser?: TokenPayload): Promise<JobPositionResponse[]> {
+    const jobPositions = await prisma.jobPosition.findMany({
+      where: {
+        is_deleted: false,
+      },
       include: {
         division: true,
       },
     });
 
-    if (!jobPosition) {
-      throw new ResponseError(400, "There is no job position created");
+    return toJobPositionResponseGetAll(jobPositions);
+  }
+
+  static async deleteJobPosition(currentUser: TokenPayload, id: number): Promise<void> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
     }
-    return toJobPositionResponseGetAll(jobPosition);
+
+    const existing = await prisma.jobPosition.findUnique({
+      where: { id: id },
+    });
+
+    if (!existing || existing.is_deleted) {
+      throw new ResponseError(404, "Job Position not found");
+    }
+
+    await prisma.jobPosition.update({
+      where: { id: id },
+      data: {
+        is_deleted: true,
+      },
+    });
   }
 }

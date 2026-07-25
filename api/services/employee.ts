@@ -2,16 +2,30 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
-import { EmployeeCreateRequest, EmployeeResponse, EmployeeStatusUpdateRequest, EmployeeUpdateRequest, generateEmployeeCode, toEmployeeResponse, toEmployeeResponseGetAll } from "../models/employee";
+import type { TokenPayload } from "../middleware/jwt";
+import {
+  EmployeeCreateRequest,
+  EmployeeResponse,
+  EmployeeStatusUpdateRequest,
+  EmployeeUpdateRequest,
+  generateEmployeeCode,
+  toEmployeeResponse,
+  toEmployeeResponseGetAll,
+} from "../models/employee";
 
 export class EmployeeService {
-  static async createEmployee(request: EmployeeCreateRequest): Promise<EmployeeResponse> {
+  static async createEmployee(currentUser: TokenPayload, request: EmployeeCreateRequest): Promise<EmployeeResponse> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const createValidate = Validation.validate(UseValidation.EMPLOYEE_CREATE, request) as EmployeeCreateRequest;
     const isEmployeeExist = await prisma.employee.count({
       where: {
         full_name: createValidate.full_name,
         phone: createValidate.phone,
         bank_account: createValidate.bank_account,
+        is_deleted: false,
       },
     });
 
@@ -47,8 +61,37 @@ export class EmployeeService {
     return toEmployeeResponse(employee);
   }
 
-  static async getAllEmployee(): Promise<EmployeeResponse[]> {
-    const employee = await prisma.employee.findMany({
+  static async getAllEmployee(currentUser: TokenPayload): Promise<EmployeeResponse[]> {
+    if (currentUser.role !== "ADMIN" && currentUser.role !== "HR") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
+    const employees = await prisma.employee.findMany({
+      where: {
+        is_deleted: false,
+      },
+      include: {
+        job_position: {
+          include: {
+            division: true,
+          },
+        },
+      },
+    });
+
+    return toEmployeeResponseGetAll(employees);
+  }
+
+  static async getEmployeeById(currentUser: TokenPayload, id: number): Promise<EmployeeResponse> {
+    if (currentUser.role !== "ADMIN" && currentUser.role !== "HR") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
+    const employee = await prisma.employee.findFirst({
+      where: {
+        id: id,
+        is_deleted: false,
+      },
       include: {
         job_position: {
           include: {
@@ -59,13 +102,26 @@ export class EmployeeService {
     });
 
     if (!employee) {
-      throw new ResponseError(400, "There is no employee created");
+      throw new ResponseError(404, "Employee not found");
     }
-    return toEmployeeResponseGetAll(employee);
+
+    return toEmployeeResponse(employee);
   }
 
-  static async updateEmployee(id: number, request: EmployeeUpdateRequest): Promise<EmployeeResponse> {
+  static async updateEmployee(currentUser: TokenPayload, id: number, request: EmployeeUpdateRequest): Promise<EmployeeResponse> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const updateValidate = Validation.validate(UseValidation.EMPLOYEE_UPDATE, request) as EmployeeUpdateRequest;
+
+    const existing = await prisma.employee.findFirst({
+      where: { id: id, is_deleted: false },
+    });
+
+    if (!existing) {
+      throw new ResponseError(404, "Employee not found");
+    }
 
     const employee = await prisma.employee.update({
       where: {
@@ -89,14 +145,23 @@ export class EmployeeService {
       },
     });
 
-    if (!employee) {
-      throw new ResponseError(400, "Invalid Request");
-    }
     return toEmployeeResponse(employee);
   }
 
-  static async updateStatusEmployee(id: number, request: EmployeeStatusUpdateRequest): Promise<EmployeeResponse> {
+  static async updateStatusEmployee(currentUser: TokenPayload, id: number, request: EmployeeStatusUpdateRequest): Promise<EmployeeResponse> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const updateStatusValidate = Validation.validate(UseValidation.EMPLOYEE_UPDATE_STATUS, request) as EmployeeStatusUpdateRequest;
+
+    const existing = await prisma.employee.findFirst({
+      where: { id: id, is_deleted: false },
+    });
+
+    if (!existing) {
+      throw new ResponseError(404, "Employee not found");
+    }
 
     const employee = await prisma.employee.update({
       where: {
@@ -114,9 +179,27 @@ export class EmployeeService {
       },
     });
 
-    if (!employee) {
-      throw new ResponseError(400, "Invalid Request");
-    }
     return toEmployeeResponse(employee);
+  }
+
+  static async deleteEmployee(currentUser: TokenPayload, id: number): Promise<void> {
+    if (currentUser.role !== "ADMIN") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
+    const existing = await prisma.employee.findFirst({
+      where: { id: id, is_deleted: false },
+    });
+
+    if (!existing) {
+      throw new ResponseError(404, "Employee not found");
+    }
+
+    await prisma.employee.update({
+      where: { id: id },
+      data: {
+        is_deleted: true,
+      },
+    });
   }
 }

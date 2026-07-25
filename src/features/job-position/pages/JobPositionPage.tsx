@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useJobPositionsQuery } from "../hooks/useJobPositionsQuery";
+import { useDeleteJobPositionMutation } from "../hooks/useDeleteJobPositionMutation";
 import type { JobPosition } from "../job-position.type";
 import { JobPositionTable } from "../components/JobPositionTable";
 import { JobPositionFormDialog } from "../components/JobPositionFormDialog";
@@ -10,6 +11,7 @@ import { useAuth } from "@/providers/auth-provider";
 export function JobPositionPage() {
   const { user } = useAuth();
   const { data: jobPositions = [], isLoading } = useJobPositionsQuery();
+  const deleteMutation = useDeleteJobPositionMutation();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState<JobPosition | null>(null);
 
@@ -21,6 +23,10 @@ export function JobPositionPage() {
   const handleEdit = (jobPosition: JobPosition) => {
     setSelectedPosition(jobPosition);
     setIsOpen(true);
+  };
+
+  const handleDelete = (jobPosition: JobPosition) => {
+    deleteMutation.mutate(jobPosition.id);
   };
 
   const canManage = user?.role === "ADMIN" || user?.role === "HR";
@@ -54,6 +60,7 @@ export function JobPositionPage() {
         jobPositions={jobPositions}
         isLoading={isLoading}
         onEdit={handleEdit}
+        onDelete={user?.role === "ADMIN" ? handleDelete : undefined}
       />
 
       {/* Form Dialog */}

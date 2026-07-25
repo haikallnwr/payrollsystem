@@ -22,7 +22,7 @@ export function authenticate(
   if (!token) {
     res.status(401).json({
       code: 401,
-      message: "Unauthorized — no token provided",
+      message: "Unauthorized - no token provided",
     });
     return;
   }
@@ -34,7 +34,7 @@ export function authenticate(
   } catch {
     res.status(401).json({
       code: 401,
-      message: "Unauthorized — invalid or expired token",
+      message: "Unauthorized - invalid or expired token",
     });
   }
 }
@@ -64,7 +64,7 @@ export function authorizeAdmin(
     if (!user || (user.role !== "ADMIN" && user.role !== "HR")) {
       res.status(403).json({
         code: 403,
-        message: "Forbidden — insufficient privileges",
+        message: "Forbidden - insufficient privileges",
       });
       return;
     }
@@ -73,14 +73,7 @@ export function authorizeAdmin(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
-/**
- * Resolves the token from the request.
- * Priority: HttpOnly cookie → Authorization header (backwards compat).
- */
 function extractToken(req: Request): string | undefined {
   // Primary: HttpOnly cookie
   const cookieToken: unknown = req.cookies?.[TOKEN_COOKIE_NAME];

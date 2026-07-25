@@ -2,7 +2,10 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
+import type { TokenPayload } from "../middleware/jwt";
 import {
+  BatchPayrollGenerateRequest,
+  BatchPayrollResultResponse,
   PayrollGenerateRequest,
   PayrollResponse,
   toPayrollResponse,
@@ -11,7 +14,7 @@ import {
 import { PayrollStatus } from "../generated/prisma/client";
 
 const payrollInclude = {
-  employee: { select: { full_name: true, employee_code: true } },
+  employee: { select: { full_name: true, employee_code: true, user_id: true } },
   generator: { select: { email: true } },
   payslip: { select: { slip_number: true } },
   overtimes: { select: { id: true, date: true, hours: true, amount: true } },
@@ -19,11 +22,15 @@ const payrollInclude = {
 } as const;
 
 export class PayrollService {
-  static async generatePayroll(generatedByUserId: number, request: PayrollGenerateRequest): Promise<PayrollResponse> {
+  static async generatePayroll(currentUser: TokenPayload, request: PayrollGenerateRequest): Promise<PayrollResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const createValidate = Validation.validate(UseValidation.PAYROLL_CREATE, request) as PayrollGenerateRequest;
 
-    const employee = await prisma.employee.findUnique({
-      where: { id: createValidate.employee_id },
+    const employee = await prisma.employee.findFirst({
+      where: { id: createValidate.employee_id, is_deleted: false },
     });
 
     if (!employee) {
@@ -63,14 +70,9 @@ export class PayrollService {
       const reimbursementTotal = reimbursements.reduce((sum, r) => sum + Number(r.amount), 0);
       const otherDeduction = createValidate.other_deduction ?? 0;
 
-      // gross = basic + overtime + reimbursement
       const grossSalary = basicSalary + overtimeTotal + reimbursementTotal;
-
-      // tax is the rupiah amount: gross * tax_percentage / 100
       const taxPercentage = createValidate.tax_percentage;
-      const tax = grossSalary * taxPercentage / 100;
-
-      // net = gross - tax - other_deduction
+      const tax = (grossSalary * taxPercentage) / 100;
       const netSalary = grossSalary - tax - otherDeduction;
 
       const created = await tx.payroll.create({
@@ -87,7 +89,7 @@ export class PayrollService {
           other_deduction_note: createValidate.other_deduction_note,
           gross_salary: grossSalary,
           net_salary: netSalary,
-          generated_by: generatedByUserId,
+          generated_by: currentUser.id,
         },
         include: payrollInclude,
       });
@@ -117,19 +119,149 @@ export class PayrollService {
     return toPayrollResponse(payroll);
   }
 
-  static async getAllPayroll(): Promise<PayrollResponse[]> {
-    const payrolls = await prisma.payroll.findMany({
-      include: payrollInclude,
+  static async generateBatchPayroll(
+    currentUser: TokenPayload,
+    request: BatchPayrollGenerateRequest,
+  ): Promise<BatchPayrollResultResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
+    const batchValidate = Validation.validate(
+      UseValidation.PAYROLL_GENERATE_BATCH,
+      request,
+    ) as BatchPayrollGenerateRequest;
+
+    const activeEmployees = await prisma.employee.findMany({
+      where: {
+        employment_status: "ACTIVE",
+        is_deleted: false,
+      },
     });
 
-    if (!payrolls) {
-      throw new ResponseError(400, "There is no payroll created");
+    if (activeEmployees.length === 0) {
+      throw new ResponseError(400, "No active employees found to generate payroll.");
     }
+
+    const createdPayrolls: PayrollResponse[] = [];
+    let skippedCount = 0;
+    let createdCount = 0;
+
+    await prisma.$transaction(async (tx) => {
+      for (const employee of activeEmployees) {
+        const existing = await tx.payroll.findFirst({
+          where: {
+            employee_id: employee.id,
+            month: batchValidate.month,
+            year: batchValidate.year,
+          },
+        });
+
+        if (existing) {
+          skippedCount++;
+          continue;
+        }
+
+        const reimbursements = await tx.reimbursement.findMany({
+          where: {
+            employee_id: employee.id,
+            status: "APPROVED",
+            payroll_id: null,
+          },
+        });
+
+        const overtimes = await tx.overtime.findMany({
+          where: {
+            employee_id: employee.id,
+            payroll_id: null,
+          },
+        });
+
+        const basicSalary = Number(employee.base_salary);
+        const overtimeTotal = overtimes.reduce((sum, o) => sum + Number(o.amount), 0);
+        const reimbursementTotal = reimbursements.reduce((sum, r) => sum + Number(r.amount), 0);
+        const otherDeduction = batchValidate.other_deduction ?? 0;
+
+        const grossSalary = basicSalary + overtimeTotal + reimbursementTotal;
+        const taxPercentage = batchValidate.tax_percentage;
+        const tax = (grossSalary * taxPercentage) / 100;
+        const netSalary = grossSalary - tax - otherDeduction;
+
+        const created = await tx.payroll.create({
+          data: {
+            employee_id: employee.id,
+            month: batchValidate.month,
+            year: batchValidate.year,
+            basic_salary: basicSalary,
+            overtime_total: overtimeTotal,
+            reimbursement_total: reimbursementTotal,
+            tax_percentage: taxPercentage,
+            tax: tax,
+            other_deduction: otherDeduction,
+            other_deduction_note: batchValidate.other_deduction_note,
+            gross_salary: grossSalary,
+            net_salary: netSalary,
+            generated_by: currentUser.id,
+          },
+          include: payrollInclude,
+        });
+
+        if (overtimes.length > 0) {
+          await tx.overtime.updateMany({
+            where: { id: { in: overtimes.map((o) => o.id) } },
+            data: { payroll_id: created.id },
+          });
+        }
+
+        if (reimbursements.length > 0) {
+          await tx.reimbursement.updateMany({
+            where: { id: { in: reimbursements.map((r) => r.id) } },
+            data: { payroll_id: created.id },
+          });
+        }
+
+        const fullPayroll = await tx.payroll.findUniqueOrThrow({
+          where: { id: created.id },
+          include: payrollInclude,
+        });
+
+        createdPayrolls.push(toPayrollResponse(fullPayroll));
+        createdCount++;
+      }
+    });
+
+    return {
+      processedCount: activeEmployees.length,
+      createdCount,
+      skippedCount,
+      payrolls: createdPayrolls,
+    };
+  }
+
+  static async getAllPayroll(currentUser: TokenPayload): Promise<PayrollResponse[]> {
+    let whereClause = {};
+
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee) {
+        return [];
+      }
+
+      whereClause = { employee_id: userEmployee.id };
+    }
+
+    const payrolls = await prisma.payroll.findMany({
+      where: whereClause,
+      include: payrollInclude,
+    });
 
     return toPayrollResponseGetAll(payrolls);
   }
 
-  static async getPayrollById(id: number): Promise<PayrollResponse> {
+  static async getPayrollById(currentUser: TokenPayload, id: number): Promise<PayrollResponse> {
     const payroll = await prisma.payroll.findUnique({
       where: { id: id },
       include: payrollInclude,
@@ -139,10 +271,28 @@ export class PayrollService {
       throw new ResponseError(404, "Payroll not found");
     }
 
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee || payroll.employee_id !== userEmployee.id) {
+        throw new ResponseError(403, "You are not allowed to access this resource.");
+      }
+    }
+
     return toPayrollResponse(payroll);
   }
 
-  static async updatePayrollStatus(id: number, request: { status: PayrollStatus }): Promise<PayrollResponse> {
+  static async updatePayrollStatus(
+    currentUser: TokenPayload,
+    id: number,
+    request: { status: PayrollStatus },
+  ): Promise<PayrollResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const updateValidate = Validation.validate(UseValidation.PAYROLL_UPDATE, request) as { status: PayrollStatus };
 
     const existing = await prisma.payroll.findUnique({

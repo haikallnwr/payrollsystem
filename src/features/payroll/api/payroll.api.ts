@@ -22,6 +22,11 @@ export const PayrollApi = {
     return response.data;
   },
 
+  generateBatch: async (data: any): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.post<ApiResponse<any>>("/payrolls/generate-batch", data);
+    return response.data;
+  },
+
   updateStatus: async (id: number, data: PayrollStatusUpdateInput): Promise<ApiResponse<Payroll>> => {
     const response = await axiosInstance.put<ApiResponse<Payroll>>(`/payrolls/status/${id}`, data);
     return response.data;

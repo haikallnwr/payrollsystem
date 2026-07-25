@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useDivisionsQuery } from "../hooks/useDivisionsQuery";
+import { useDeleteDivisionMutation } from "../hooks/useDeleteDivisionMutation";
+import type { Division } from "../division.type";
 import { DivisionTable } from "../components/DivisionTable";
 import { DivisionFormDialog } from "../components/DivisionFormDialog";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,12 @@ import { useAuth } from "@/providers/auth-provider";
 export function DivisionPage() {
   const { user } = useAuth();
   const { data: divisions = [], isLoading } = useDivisionsQuery();
+  const deleteMutation = useDeleteDivisionMutation();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleDelete = (division: Division) => {
+    deleteMutation.mutate(division.id);
+  };
 
   const canManage = user?.role === "ADMIN" || user?.role === "HR";
 
@@ -38,7 +45,11 @@ export function DivisionPage() {
       </div>
 
       {/* Main Table */}
-      <DivisionTable divisions={divisions} isLoading={isLoading} />
+      <DivisionTable
+        divisions={divisions}
+        isLoading={isLoading}
+        onDelete={user?.role === "ADMIN" ? handleDelete : undefined}
+      />
 
       {/* Create Dialog */}
       <DivisionFormDialog open={isOpen} onOpenChange={setIsOpen} />

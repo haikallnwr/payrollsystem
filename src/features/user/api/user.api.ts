@@ -12,4 +12,9 @@ export const UserApi = {
     const response = await axiosInstance.post<ApiResponse<UserItem>>("/users/register", data);
     return response.data;
   },
+
+  delete: async (id: number): Promise<ApiResponse> => {
+    const response = await axiosInstance.delete<ApiResponse>(`/users/delete/${id}`);
+    return response.data;
+  },
 };

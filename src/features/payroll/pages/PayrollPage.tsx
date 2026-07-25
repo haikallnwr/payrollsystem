@@ -6,10 +6,11 @@ import type { Payroll } from "../payroll.type";
 import type { Payslip } from "@/features/payslip/payslip.type";
 import { PayrollTable } from "../components/PayrollTable";
 import { PayrollFormDialog } from "../components/PayrollFormDialog";
+import { BatchPayrollFormDialog } from "../components/BatchPayrollFormDialog";
 import { PayrollDetailModal } from "../components/PayrollDetailModal";
 import { PayslipModal } from "@/features/payslip/components/PayslipModal";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign, Calculator, Clock, Filter } from "lucide-react";
+import { Plus, DollarSign, Calculator, Clock, Filter, Zap } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import {
   Select,
@@ -30,6 +31,7 @@ export function PayrollPage() {
 
   // Dialog & Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBatchFormOpen, setIsBatchFormOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isPayslipOpen, setIsPayslipOpen] = useState(false);
 
@@ -121,13 +123,23 @@ export function PayrollPage() {
         </div>
 
         {canManage && (
-          <Button
-            onClick={handleCreate}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm shrink-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Generate Payroll
-          </Button>
+          <div className="flex items-center space-x-2 shrink-0">
+            <Button
+              onClick={() => setIsBatchFormOpen(true)}
+              className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium shadow-xs"
+            >
+              <Zap className="w-4 h-4 mr-2 fill-amber-200" />
+              Run Batch Payroll
+            </Button>
+            <Button
+              onClick={handleCreate}
+              variant="outline"
+              className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Single Payroll
+            </Button>
+          </div>
         )}
       </div>
 
@@ -169,7 +181,7 @@ export function PayrollPage() {
       </div>
 
       {/* Status Filter Bar */}
-      <div className="flex items-center space-x-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div className="flex items-center space-x-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
         <Filter className="w-4 h-4 text-slate-400 shrink-0" />
         <span className="text-xs font-semibold text-slate-500">Filter by Status:</span>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -199,6 +211,8 @@ export function PayrollPage() {
 
       {/* Modals */}
       <PayrollFormDialog open={isFormOpen} onOpenChange={setIsFormOpen} />
+
+      <BatchPayrollFormDialog open={isBatchFormOpen} onOpenChange={setIsBatchFormOpen} />
 
       <PayrollDetailModal
         open={isDetailOpen}

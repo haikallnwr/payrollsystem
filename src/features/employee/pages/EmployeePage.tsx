@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useEmployeesQuery } from "../hooks/useEmployeesQuery";
+import { useDeleteEmployeeMutation } from "../hooks/useDeleteEmployeeMutation";
 import type { Employee } from "../employee.type";
 import { EmployeeTable } from "../components/EmployeeTable";
 import { EmployeeFilter } from "../components/EmployeeFilter";
@@ -13,6 +14,7 @@ import { useAuth } from "@/providers/auth-provider";
 export function EmployeePage() {
   const { user } = useAuth();
   const { data: employees = [], isLoading } = useEmployeesQuery();
+  const deleteMutation = useDeleteEmployeeMutation();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -68,6 +70,10 @@ export function EmployeePage() {
   const handleCreateUserAccount = (employee: Employee) => {
     setSelectedEmployee(employee);
     setIsUserFormOpen(true);
+  };
+
+  const handleDelete = (employee: Employee) => {
+    deleteMutation.mutate(employee.id);
   };
 
   const canManage = user?.role === "ADMIN" || user?.role === "HR";
@@ -144,6 +150,7 @@ export function EmployeePage() {
         onEdit={handleEdit}
         onChangeStatus={handleChangeStatus}
         onCreateUserAccount={canManage ? handleCreateUserAccount : undefined}
+        onDelete={user?.role === "ADMIN" ? handleDelete : undefined}
       />
 
       {/* Modals */}

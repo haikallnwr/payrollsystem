@@ -2,6 +2,7 @@ import { ResponseError } from "../lib/error";
 import { prisma } from "../lib/prisma";
 import { Validation } from "../lib/validation";
 import { UseValidation } from "../middleware/validation";
+import type { TokenPayload } from "../middleware/jwt";
 import {
   PayslipResponse,
   toPayslipResponse,
@@ -15,13 +16,18 @@ const payslipInclude = {
       month: true,
       year: true,
       net_salary: true,
-      employee: { select: { full_name: true, employee_code: true } },
+      employee_id: true,
+      employee: { select: { full_name: true, employee_code: true, user_id: true } },
     },
   },
 } as const;
 
 export class PayslipService {
-  static async generatePayslip(request: { payroll_id: number }): Promise<PayslipResponse> {
+  static async generatePayslip(currentUser: TokenPayload, request: { payroll_id: number }): Promise<PayslipResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
     const createValidate = Validation.validate(UseValidation.PAYSLIP_CREATE, request) as { payroll_id: number };
 
     const payroll = await prisma.payroll.findUnique({
@@ -61,19 +67,30 @@ export class PayslipService {
     return toPayslipResponse(payslip);
   }
 
-  static async getAllPayslip(): Promise<PayslipResponse[]> {
+  static async getAllPayslip(currentUser: TokenPayload): Promise<PayslipResponse[]> {
+    let whereClause = {};
+
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee) {
+        return [];
+      }
+
+      whereClause = { payroll: { employee_id: userEmployee.id } };
+    }
+
     const payslips = await prisma.payslip.findMany({
+      where: whereClause,
       include: payslipInclude,
     });
-
-    if (!payslips) {
-      throw new ResponseError(400, "There is no payslip created");
-    }
 
     return toPayslipResponseGetAll(payslips);
   }
 
-  static async getPayslipById(id: number): Promise<PayslipResponse> {
+  static async getPayslipById(currentUser: TokenPayload, id: number): Promise<PayslipResponse> {
     const payslip = await prisma.payslip.findUnique({
       where: { id: id },
       include: payslipInclude,
@@ -83,10 +100,20 @@ export class PayslipService {
       throw new ResponseError(404, "Payslip not found");
     }
 
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee || payslip.payroll.employee_id !== userEmployee.id) {
+        throw new ResponseError(403, "You are not allowed to access this resource.");
+      }
+    }
+
     return toPayslipResponse(payslip);
   }
 
-  static async getPayslipByPayrollId(payrollId: number): Promise<PayslipResponse> {
+  static async getPayslipByPayrollId(currentUser: TokenPayload, payrollId: number): Promise<PayslipResponse> {
     const payslip = await prisma.payslip.findUnique({
       where: { payroll_id: payrollId },
       include: payslipInclude,
@@ -94,6 +121,16 @@ export class PayslipService {
 
     if (!payslip) {
       throw new ResponseError(404, "Payslip not found for this payroll");
+    }
+
+    if (currentUser.role === "EMPLOYEE") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (!userEmployee || payslip.payroll.employee_id !== userEmployee.id) {
+        throw new ResponseError(403, "You are not allowed to access this resource.");
+      }
     }
 
     return toPayslipResponse(payslip);

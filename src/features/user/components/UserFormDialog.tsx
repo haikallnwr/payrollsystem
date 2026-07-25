@@ -30,6 +30,8 @@ interface UserFormDialogProps {
   defaultEmployeeId?: number | null;
 }
 
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
 export function UserFormDialog({
   open,
   onOpenChange,
@@ -81,6 +83,15 @@ export function UserFormDialog({
     onOpenChange(false);
   };
 
+  const employeeOptions = [
+    { value: 0, label: "-- No Employee Link (Standalone User) --" },
+    ...employees.map((emp) => ({
+      value: emp.id,
+      label: `${emp.full_name} (${emp.employee_code})`,
+      sublabel: `${emp.position_name} — ${emp.division_name}`,
+    })),
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
@@ -101,31 +112,17 @@ export function UserFormDialog({
               <User className="w-3.5 h-3.5 text-slate-500" />
               <span>Link to Employee (Optional)</span>
             </Label>
-            <Select
+            <SearchableSelect
               disabled={isLoadingEmployees}
-              value={selectedEmployeeId ? String(selectedEmployeeId) : "none"}
+              value={selectedEmployeeId || 0}
               onValueChange={(val) => {
-                if (val === "none") {
-                  setValue("employee_id", undefined);
-                } else {
-                  const empId = Number(val);
-                  setValue("employee_id", empId);
-                  // Autofill email if employee name matches or is available
-                }
+                const num = Number(val);
+                setValue("employee_id", num === 0 ? undefined : num);
               }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select employee to link..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">-- No Employee Link (Standalone User) --</SelectItem>
-                {employees.map((emp) => (
-                  <SelectItem key={emp.id} value={String(emp.id)}>
-                    {emp.full_name} ({emp.employee_code}) — {emp.position_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Search & select employee to link..."
+              searchPlaceholder="Search employee name or code..."
+              options={employeeOptions}
+            />
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               Linking allows this employee to log in and view their personal payroll and attendance history.
             </p>

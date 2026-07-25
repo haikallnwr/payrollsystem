@@ -12,4 +12,9 @@ export const DivisionApi = {
     const response = await axiosInstance.post<ApiResponse<Division>>("/divisions/create", data);
     return response.data;
   },
+
+  delete: async (id: number): Promise<ApiResponse> => {
+    const response = await axiosInstance.delete<ApiResponse>(`/divisions/delete/${id}`);
+    return response.data;
+  },
 };

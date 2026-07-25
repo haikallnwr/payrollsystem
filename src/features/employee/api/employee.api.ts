@@ -30,4 +30,9 @@ export const EmployeeApi = {
     const response = await axiosInstance.put<ApiResponse<Employee>>(`/employees/status/${id}`, data);
     return response.data;
   },
+
+  delete: async (id: number): Promise<ApiResponse> => {
+    const response = await axiosInstance.delete<ApiResponse>(`/employees/delete/${id}`);
+    return response.data;
+  },
 };

@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
 import { useUsersQuery } from "../hooks/useUsersQuery";
+import { useDeleteUserMutation } from "../hooks/useDeleteUserMutation";
+import type { UserItem } from "../user.type";
 import { UserTable } from "../components/UserTable";
 import { UserFormDialog } from "../components/UserFormDialog";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import { useAuth } from "@/providers/auth-provider";
 export function UserPage() {
   const { user } = useAuth();
   const { data: users = [], isLoading } = useUsersQuery();
+  const deleteMutation = useDeleteUserMutation();
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
@@ -34,6 +37,10 @@ export function UserPage() {
   const adminCount = useMemo(() => users.filter((u) => u.role === "ADMIN").length, [users]);
   const hrCount = useMemo(() => users.filter((u) => u.role === "HR").length, [users]);
   const employeeUserCount = useMemo(() => users.filter((u) => u.role === "EMPLOYEE").length, [users]);
+
+  const handleDelete = (userItem: UserItem) => {
+    deleteMutation.mutate(userItem.id);
+  };
 
   const canManage = user?.role === "ADMIN" || user?.role === "HR";
 
@@ -132,7 +139,11 @@ export function UserPage() {
       </div>
 
       {/* Main Table */}
-      <UserTable users={filteredUsers} isLoading={isLoading} />
+      <UserTable
+        users={filteredUsers}
+        isLoading={isLoading}
+        onDelete={user?.role === "ADMIN" ? handleDelete : undefined}
+      />
 
       {/* Create Dialog */}
       <UserFormDialog open={isFormOpen} onOpenChange={setIsFormOpen} />

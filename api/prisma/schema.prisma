@@ -26,7 +26,9 @@ enum ReimbursementStatus {
 
 enum PayrollStatus {
   DRAFT
+  APPROVED
   PAID
+  REJECTED
 }
 
 enum EmploymentStatus {
@@ -93,6 +95,7 @@ model Employee {
   bank_name         String?
   bank_account      String?
   employment_status EmploymentStatus @default(ACTIVE)
+  is_deleted        Boolean          @default(false)
   created_at        DateTime         @default(now())
   updated_at        DateTime         @updatedAt
   job_position      JobPosition      @relation(fields: [job_position_id], references: [id])
@@ -102,6 +105,7 @@ model Employee {
   payrolls          Payroll[]
 
   @@index([employment_status])
+  @@index([is_deleted])
 }
 
 model Reimbursement {

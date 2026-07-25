@@ -36,6 +36,11 @@ export type UserUpdateRoleRequest = {
   role?: RoleUser;
 };
 
+export type UserUpdatePasswordRequest = {
+  old_password?: string;
+  new_password: string;
+};
+
 export type UserResponse = {
   id: number;
   email: string;

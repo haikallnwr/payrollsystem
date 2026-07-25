@@ -2,11 +2,10 @@ import { EmploymentStatus, JobLevel, PayrollStatus, ReimbursementStatus, RoleUse
 import { z, ZodType } from "zod";
 
 export class UseValidation {
-  // ========================= USER =========================
 
   static readonly USER_REGISTER: ZodType = z.object({
     email: z.email(),
-    password: z.string().min(8).max(100),
+    password: z.string().min(6).max(100),
     role: z.enum(Object.values(RoleUser) as [RoleUser, ...RoleUser[]]).optional(),
     employee_id: z.number().int().positive().optional(),
   });
@@ -18,12 +17,16 @@ export class UseValidation {
 
   static readonly USER_UPDATE: ZodType = z.object({
     email: z.email().optional(),
-    password: z.string().min(8).max(100).optional(),
+    password: z.string().min(6).max(100).optional(),
     role: z.enum(Object.values(RoleUser) as [RoleUser, ...RoleUser[]]).optional(),
     employee_id: z.number().int().positive().optional(),
   });
 
-  // ========================= DIVISION =========================
+  static readonly USER_UPDATE_PASSWORD: ZodType = z.object({
+    old_password: z.string().optional(),
+    new_password: z.string().min(6).max(100),
+  });
+
 
   static readonly DIVISION_CREATE: ZodType = z.object({
     name: z.string().trim().min(1).max(100),
@@ -35,7 +38,7 @@ export class UseValidation {
     description: z.string().trim().max(255).optional(),
   });
 
-  // ========================= JOB POSITION =========================
+
 
   static readonly JOB_POSITION_CREATE: ZodType = z.object({
     division_id: z.number().int().positive(),
@@ -53,7 +56,7 @@ export class UseValidation {
     description: z.string().trim().max(255).optional(),
   });
 
-  // ========================= EMPLOYEE =========================
+
 
   static readonly EMPLOYEE_CREATE: ZodType = z.object({
     user_id: z.number().int().positive().optional(),
@@ -82,7 +85,7 @@ export class UseValidation {
     employment_status: z.enum(Object.values(EmploymentStatus) as [EmploymentStatus, ...EmploymentStatus[]]).optional(),
   });
 
-  // ========================= REIMBURSEMENT =========================
+
 
   static readonly REIMBURSEMENT_CREATE: ZodType = z.object({
     employee_id: z.number().int().positive(),
@@ -103,7 +106,7 @@ export class UseValidation {
     status: z.enum(Object.values(ReimbursementStatus) as [ReimbursementStatus, ...ReimbursementStatus[]]),
   });
 
-  // ========================= OVERTIME =========================
+
 
   static readonly OVERTIME_CREATE: ZodType = z.object({
     employee_id: z.number().int().positive(),
@@ -118,10 +121,18 @@ export class UseValidation {
     notes: z.string().trim().max(255).optional(),
   });
 
-  // ========================= PAYROLL =========================
+
 
   static readonly PAYROLL_CREATE: ZodType = z.object({
     employee_id: z.number().int().positive(),
+    month: z.number().int().min(1).max(12),
+    year: z.number().int().min(2000),
+    tax_percentage: z.number().min(0).max(100),
+    other_deduction: z.number().min(0).optional(),
+    other_deduction_note: z.string().trim().max(255).optional(),
+  });
+
+  static readonly PAYROLL_GENERATE_BATCH: ZodType = z.object({
     month: z.number().int().min(1).max(12),
     year: z.number().int().min(2000),
     tax_percentage: z.number().min(0).max(100),
@@ -134,7 +145,6 @@ export class UseValidation {
     other_deduction: z.number().min(0).optional(),
   });
 
-  // ========================= PAYSLIP =========================
 
   static readonly PAYSLIP_CREATE: ZodType = z.object({
     payroll_id: z.number().int().positive(),

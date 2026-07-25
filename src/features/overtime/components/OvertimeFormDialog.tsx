@@ -16,13 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
 interface OvertimeFormDialogProps {
@@ -30,6 +23,8 @@ interface OvertimeFormDialogProps {
   onOpenChange: (open: boolean) => void;
   overtime?: Overtime | null;
 }
+
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function OvertimeFormDialog({
   open,
@@ -45,6 +40,7 @@ export function OvertimeFormDialog({
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<OvertimeFormData>({
@@ -56,6 +52,8 @@ export function OvertimeFormDialog({
       notes: "",
     },
   });
+
+  const selectedEmployeeId = watch("employee_id");
 
   useEffect(() => {
     if (overtime) {
@@ -119,22 +117,18 @@ export function OvertimeFormDialog({
             <Label htmlFor="employee_id" className="text-xs font-semibold">
               Employee *
             </Label>
-            <Select
+            <SearchableSelect
               disabled={isLoadingEmployees}
-              onValueChange={(val: string) => setValue("employee_id", Number(val))}
-              defaultValue={overtime ? String(overtime.employee_id) : undefined}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select employee..." />
-              </SelectTrigger>
-              <SelectContent>
-                {employees.map((emp) => (
-                  <SelectItem key={emp.id} value={String(emp.id)}>
-                    {emp.full_name} ({emp.employee_code}) — {emp.division_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              value={selectedEmployeeId}
+              onValueChange={(val) => setValue("employee_id", Number(val))}
+              placeholder="Search & select employee..."
+              searchPlaceholder="Search employee name, code, or division..."
+              options={employees.map((emp) => ({
+                value: emp.id,
+                label: `${emp.full_name} (${emp.employee_code})`,
+                sublabel: `${emp.position_name} — ${emp.division_name}`,
+              }))}
+            />
             {errors.employee_id && (
               <p className="text-xs text-red-500">{errors.employee_id.message}</p>
             )}

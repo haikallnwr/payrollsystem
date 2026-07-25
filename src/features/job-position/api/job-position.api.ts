@@ -17,4 +17,9 @@ export const JobPositionApi = {
     const response = await axiosInstance.put<ApiResponse<JobPosition>>(`/jobPosition/update/${id}`, data);
     return response.data;
   },
+
+  delete: async (id: number): Promise<ApiResponse> => {
+    const response = await axiosInstance.delete<ApiResponse>(`/jobPosition/delete/${id}`);
+    return response.data;
+  },
 };

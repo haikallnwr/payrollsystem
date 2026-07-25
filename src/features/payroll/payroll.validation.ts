@@ -10,3 +10,13 @@ export const payrollGenerateSchema = z.object({
 });
 
 export type PayrollGenerateFormData = z.infer<typeof payrollGenerateSchema>;
+
+export const batchPayrollSchema = z.object({
+  month: z.number().min(1, "Month must be between 1 and 12").max(12),
+  year: z.number().min(2000, "Year is required"),
+  tax_percentage: z.number().min(0, "Tax percentage cannot be negative").max(100, "Tax cannot exceed 100%"),
+  other_deduction: z.number().min(0, "Deduction cannot be negative").optional(),
+  other_deduction_note: z.string().optional(),
+});
+
+export type BatchPayrollFormData = z.infer<typeof batchPayrollSchema>;

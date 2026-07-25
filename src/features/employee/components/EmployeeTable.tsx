@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Employee } from "../employee.type";
 import { EmployeeStatusBadge } from "./EmployeeStatusBadge";
 import {
@@ -16,7 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, RefreshCw, User, ShieldCheck } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Edit, RefreshCw, User, ShieldCheck, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface EmployeeTableProps {
@@ -25,6 +35,7 @@ interface EmployeeTableProps {
   onEdit: (employee: Employee) => void;
   onChangeStatus: (employee: Employee) => void;
   onCreateUserAccount?: (employee: Employee) => void;
+  onDelete?: (employee: Employee) => void;
 }
 
 export function EmployeeTable({
@@ -33,7 +44,10 @@ export function EmployeeTable({
   onEdit,
   onChangeStatus,
   onCreateUserAccount,
+  onDelete,
 }: EmployeeTableProps) {
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -75,90 +89,128 @@ export function EmployeeTable({
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
-      <Table>
-        <TableHeader className="bg-slate-50/80 dark:bg-slate-950/50">
-          <TableRow>
-            <TableHead className="w-28 text-xs font-bold uppercase tracking-wider">Code</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wider">Employee</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wider">Position & Division</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wider">Join Date</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wider">Base Salary</TableHead>
-            <TableHead className="text-xs font-bold uppercase tracking-wider">Status</TableHead>
-            <TableHead className="w-16 text-right text-xs font-bold uppercase tracking-wider"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {employees.map((emp) => (
-            <TableRow key={emp.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
-              {/* Employee Code */}
-              <TableCell className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
-                {emp.employee_code}
-              </TableCell>
-
-              {/* Full Name & Phone */}
-              <TableCell>
-                <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
-                  {emp.full_name}
-                </div>
-                {emp.phone && (
-                  <div className="text-xs text-slate-500 font-mono mt-0.5">{emp.phone}</div>
-                )}
-              </TableCell>
-
-              {/* Position & Division */}
-              <TableCell>
-                <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                  {emp.position_name} <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-bold">({emp.level})</span>
-                </div>
-                <div className="text-xs text-slate-500">{emp.division_name}</div>
-              </TableCell>
-
-              {/* Join Date */}
-              <TableCell className="text-xs text-slate-600 dark:text-slate-400">
-                {formatDate(emp.join_date)}
-              </TableCell>
-
-              {/* Base Salary */}
-              <TableCell className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-100">
-                {formatCurrency(emp.base_salary)}
-              </TableCell>
-
-              {/* Status */}
-              <TableCell>
-                <EmployeeStatusBadge status={emp.employment_status} />
-              </TableCell>
-
-              {/* Actions Dropdown */}
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuLabel className="text-xs">Employee Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onEdit(emp)}>
-                      <Edit className="w-3.5 h-3.5 mr-2 text-slate-500" />
-                      <span>Edit Details</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onChangeStatus(emp)}>
-                      <RefreshCw className="w-3.5 h-3.5 mr-2 text-slate-500" />
-                      <span>Change Status</span>
-                    </DropdownMenuItem>
-                    {onCreateUserAccount && (
-                      <DropdownMenuItem onClick={() => onCreateUserAccount(emp)}>
-                        <ShieldCheck className="w-3.5 h-3.5 mr-2 text-blue-600" />
-                        <span>Create User Account</span>
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+    <>
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-2xs">
+        <Table>
+          <TableHeader className="bg-slate-50/80 dark:bg-slate-950/50">
+            <TableRow>
+              <TableHead className="w-28 text-xs font-bold uppercase tracking-wider">Code</TableHead>
+              <TableHead className="text-xs font-bold uppercase tracking-wider">Employee</TableHead>
+              <TableHead className="text-xs font-bold uppercase tracking-wider">Position & Division</TableHead>
+              <TableHead className="text-xs font-bold uppercase tracking-wider">Join Date</TableHead>
+              <TableHead className="text-xs font-bold uppercase tracking-wider">Base Salary</TableHead>
+              <TableHead className="text-xs font-bold uppercase tracking-wider">Status</TableHead>
+              <TableHead className="w-16 text-right text-xs font-bold uppercase tracking-wider"></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {employees.map((emp) => (
+              <TableRow key={emp.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                <TableCell className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">
+                  {emp.employee_code}
+                </TableCell>
+
+                <TableCell>
+                  <div className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+                    {emp.full_name}
+                  </div>
+                  {emp.phone && (
+                    <div className="text-xs text-slate-500 font-mono mt-0.5">{emp.phone}</div>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    {emp.position_name} <span className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-bold">({emp.level})</span>
+                  </div>
+                  <div className="text-xs text-slate-500">{emp.division_name}</div>
+                </TableCell>
+
+                <TableCell className="text-xs text-slate-600 dark:text-slate-400">
+                  {formatDate(emp.join_date)}
+                </TableCell>
+
+                <TableCell className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-100">
+                  {formatCurrency(emp.base_salary)}
+                </TableCell>
+
+                <TableCell>
+                  <EmployeeStatusBadge status={emp.employment_status} />
+                </TableCell>
+
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel className="text-xs">Employee Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => onEdit(emp)}>
+                        <Edit className="w-3.5 h-3.5 mr-2 text-slate-500" />
+                        <span>Edit Details</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onChangeStatus(emp)}>
+                        <RefreshCw className="w-3.5 h-3.5 mr-2 text-slate-500" />
+                        <span>Change Status</span>
+                      </DropdownMenuItem>
+                      {onCreateUserAccount && (
+                        <DropdownMenuItem onClick={() => onCreateUserAccount(emp)}>
+                          <ShieldCheck className="w-3.5 h-3.5 mr-2 text-blue-600" />
+                          <span>Create User Account</span>
+                        </DropdownMenuItem>
+                      )}
+                      {onDelete && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setEmployeeToDelete(emp)}
+                            className="text-rose-600 dark:text-rose-400 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/40"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-2" />
+                            <span>Delete Employee</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!employeeToDelete} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-slate-900 dark:text-slate-100 flex items-center space-x-2">
+              <Trash2 className="w-5 h-5 text-rose-600" />
+              <span>Soft Delete Employee?</span>
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+              Are you sure you want to remove <strong>{employeeToDelete?.full_name}</strong> ({employeeToDelete?.employee_code})? The record will be soft-deleted and hidden from active lists.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setEmployeeToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (employeeToDelete && onDelete) {
+                  onDelete(employeeToDelete);
+                }
+                setEmployeeToDelete(null);
+              }}
+              className="bg-rose-600 hover:bg-rose-700 text-white font-medium"
+            >
+              Confirm Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

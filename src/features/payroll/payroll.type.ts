@@ -48,3 +48,18 @@ export interface PayrollGenerateInput {
 export interface PayrollStatusUpdateInput {
   status: PayrollStatus;
 }
+
+export interface BatchPayrollGenerateInput {
+  month: number;
+  year: number;
+  tax_percentage: number;
+  other_deduction?: number;
+  other_deduction_note?: string;
+}
+
+export interface BatchPayrollResultResponse {
+  processedCount: number;
+  createdCount: number;
+  skippedCount: number;
+  payrolls: Payroll[];
+}

@@ -10,6 +10,7 @@ import { reimbursementRouter } from "./routes/reimbursement";
 import { overtimeRouter } from "./routes/overtime";
 import { payrollRouter } from "./routes/payroll";
 import { payslipRouter } from "./routes/payslip";
+import { dashboardRouter } from "./routes/dashboard";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/reimbursements", reimbursementRouter);
 app.use("/api/overtimes", overtimeRouter);
 app.use("/api/payrolls", payrollRouter);
 app.use("/api/payslips", payslipRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 // ---------------------------------------------------------------------------
 // Error handling (must be registered after routes)

@@ -12,6 +12,8 @@ import { OvertimePage } from "@/features/overtime";
 import { PayrollPage } from "@/features/payroll";
 
 import { UserPage } from "@/features/user";
+import { ProfilePage } from "@/features/profile";
+import { RoleGuard } from "@/routes/RoleGuard";
 
 export const router = createBrowserRouter([
   {
@@ -41,19 +43,35 @@ export const router = createBrowserRouter([
           },
           {
             path: "users",
-            element: <UserPage />,
+            element: (
+              <RoleGuard allowedRoles={["ADMIN"]}>
+                <UserPage />
+              </RoleGuard>
+            ),
           },
           {
             path: "employees",
-            element: <EmployeePage />,
+            element: (
+              <RoleGuard allowedRoles={["ADMIN", "HR"]}>
+                <EmployeePage />
+              </RoleGuard>
+            ),
           },
           {
             path: "divisions",
-            element: <DivisionPage />,
+            element: (
+              <RoleGuard allowedRoles={["ADMIN"]}>
+                <DivisionPage />
+              </RoleGuard>
+            ),
           },
           {
             path: "job-positions",
-            element: <JobPositionPage />,
+            element: (
+              <RoleGuard allowedRoles={["ADMIN"]}>
+                <JobPositionPage />
+              </RoleGuard>
+            ),
           },
           {
             path: "reimbursements",
@@ -69,7 +87,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "profile",
-            element: <div className="p-6 font-medium text-slate-500">User Profile Settings Page (Scaffold ready)</div>,
+            element: <ProfilePage />,
           },
         ],
       },

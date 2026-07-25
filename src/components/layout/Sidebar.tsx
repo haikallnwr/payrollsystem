@@ -27,7 +27,7 @@ interface NavItem {
   title: string;
   href: string;
   icon: any;
-  badge?: string;
+  roles?: string[];
 }
 
 const mainNavItems: NavItem[] = [
@@ -35,10 +35,10 @@ const mainNavItems: NavItem[] = [
 ];
 
 const managementNavItems: NavItem[] = [
-  { title: "Users", href: "/users", icon: UserCog },
-  { title: "Employees", href: "/employees", icon: Users },
-  { title: "Divisions", href: "/divisions", icon: Building2 },
-  { title: "Job Positions", href: "/job-positions", icon: Briefcase },
+  { title: "Users", href: "/users", icon: UserCog, roles: ["ADMIN"] },
+  { title: "Employees", href: "/employees", icon: Users, roles: ["ADMIN", "HR"] },
+  { title: "Divisions", href: "/divisions", icon: Building2, roles: ["ADMIN"] },
+  { title: "Job Positions", href: "/job-positions", icon: Briefcase, roles: ["ADMIN"] },
 ];
 
 const financeNavItems: NavItem[] = [
@@ -53,6 +53,7 @@ const userNavItems: NavItem[] = [
 
 export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
   const { user, logout } = useAuth();
+  const userRole = user?.role || "EMPLOYEE";
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -64,41 +65,50 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
       .toUpperCase();
   };
 
-  const renderNavGroup = (label: string, items: NavItem[]) => (
-    <div className="py-2">
-      {!collapsed && (
-        <h3 className="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
-          {label}
-        </h3>
-      )}
-      <ul className="space-y-1 px-2">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <li key={item.href}>
-              <NavLink
-                to={item.href}
-                onClick={onNavigate}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
-                    isActive
-                      ? "bg-blue-600 text-white shadow-sm shadow-blue-500/30"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100",
-                    collapsed && "justify-center px-2"
-                  )
-                }
-                title={collapsed ? item.title : undefined}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                {!collapsed && <span>{item.title}</span>}
-              </NavLink>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
+  const filterByRole = (items: NavItem[]) => {
+    return items.filter((item) => !item.roles || item.roles.includes(userRole));
+  };
+
+  const renderNavGroup = (label: string, items: NavItem[]) => {
+    const visibleItems = filterByRole(items);
+    if (visibleItems.length === 0) return null;
+
+    return (
+      <div className="py-2">
+        {!collapsed && (
+          <h3 className="px-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+            {label}
+          </h3>
+        )}
+        <ul className="space-y-1 px-2">
+          {visibleItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.href}>
+                <NavLink
+                  to={item.href}
+                  onClick={onNavigate}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+                      isActive
+                        ? "bg-blue-600 text-white shadow-sm shadow-blue-500/30"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100",
+                      collapsed && "justify-center px-2"
+                    )
+                  }
+                  title={collapsed ? item.title : undefined}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {!collapsed && <span>{item.title}</span>}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  };
 
   return (
     <aside
