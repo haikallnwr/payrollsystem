@@ -15,7 +15,10 @@ Aplikasi berbasis web untuk mengelola data karyawan, pengajuan lembur, klaim rei
 Untuk menjaga independensi dan mencegah konflik kepentingan, pengguna dengan peran HR **tidak dapat menyetujui atau memproses pengajuan lembur, reimbursement, dan slip gaji milik dirinya sendiri**. Sistem akan secara otomatis menolak tindakan tersebut.
 
 ### 3. Aturan Lembur dan Reimbursement
-- **Jam Lembur**: Input durasi lembur wajib berupa **angka bulat** (seperti 1, 2, atau 3 jam). Tarif lembur dihitung sebesar Rp 50.000 per jam.
+- **Jam Lembur**: Input durasi lembur wajib berupa **angka bulat** (seperti 1, 2, atau 3 jam).
+- **Kalkulasi Tarif Lembur Dinamis**: Upah lembur dihitung secara otomatis berdasarkan gaji pokok karyawan menggunakan standar ketenagakerjaan:
+  $$\text{Tarif Lembur per Jam} = \frac{\text{Gaji Pokok}}{173}$$
+  $$\text{Total Upah Lembur} = \text{Jam Lembur} \times \text{Tarif Lembur per Jam}$$
 - **Reimbursement**: Karyawan mengajukan klaim biaya yang kemudian perlu disetujui oleh HR atau Admin sebelum digabungkan ke dalam perhitungan gaji.
 
 ### 4. Rumus Perhitungan Gaji

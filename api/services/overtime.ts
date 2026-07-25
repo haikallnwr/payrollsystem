@@ -10,8 +10,6 @@ import {
   toOvertimeResponseGetAll,
 } from "../models/overtime";
 
-const OVERTIME_RATE_PER_HOUR = 50000;
-
 export class OvertimeService {
   static async createOvertime(currentUser: TokenPayload, request: OvertimeCreateRequest): Promise<OvertimeResponse> {
     if (currentUser.role === "EMPLOYEE") {
@@ -39,7 +37,10 @@ export class OvertimeService {
       }
     }
 
-    const amount = createValidate.hours * OVERTIME_RATE_PER_HOUR;
+    // Formula Lembur Standar Ketenagakerjaan: (1 / 173) x Gaji Pokok
+    const baseSalary = Number(targetEmployee.base_salary || 0);
+    const hourlyRate = Math.round(baseSalary / 173);
+    const amount = createValidate.hours * hourlyRate;
 
     const overtime = await prisma.overtime.create({
       data: {
@@ -115,8 +116,14 @@ export class OvertimeService {
       }
     }
 
+    const targetEmployee = await prisma.employee.findUnique({
+      where: { id: existing.employee_id },
+    });
+    const baseSalary = Number(targetEmployee?.base_salary || 0);
+    const hourlyRate = Math.round(baseSalary / 173);
+
     const hours = updateValidate.hours ?? existing.hours;
-    const amount = hours * OVERTIME_RATE_PER_HOUR;
+    const amount = hours * hourlyRate;
 
     const overtime = await prisma.overtime.update({
       where: { id: id },

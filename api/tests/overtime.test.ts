@@ -10,7 +10,7 @@ describe("Overtime API Integration Tests", () => {
   });
 
   describe("POST /api/overtimes/create", () => {
-    it("should allow ADMIN to log overtime for an employee with integer hours", async () => {
+    it("should allow ADMIN to log overtime for an employee with integer hours and dynamic salary formula", async () => {
       const admin = await createTestUser({ role: "ADMIN" });
       const emp = await createTestUser({ role: "EMPLOYEE", fullName: "Test Overtime Staff" });
 
@@ -24,9 +24,12 @@ describe("Overtime API Integration Tests", () => {
           notes: "Late night deployment test",
         });
 
+      // Gaji pokok default = 6.000.000 -> tarif per jam = Math.round(6000000 / 173) = 34682
+      const expectedAmount = 3 * Math.round(6000000 / 173);
+
       expect(response.status).toBe(201);
       expect(response.body.data.hours).toBe(3);
-      expect(response.body.data.amount).toBe(150000);
+      expect(response.body.data.amount).toBe(expectedAmount);
     });
 
     it("should reject non-integer hours (e.g., 2.5) due to Integer validation rule", async () => {
