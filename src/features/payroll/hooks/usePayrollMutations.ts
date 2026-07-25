@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PayrollApi } from "../api/payroll.api";
 import { PAYROLL_QUERY_KEY } from "./usePayrollsQuery";
-import type { PayrollGenerateInput, PayrollStatusUpdateInput } from "../payroll.type";
+import type { BatchPayrollStatusUpdateInput, PayrollGenerateInput, PayrollStatusUpdateInput } from "../payroll.type";
 import { toast } from "sonner";
 
 export function useGeneratePayrollMutation() {
@@ -31,6 +31,21 @@ export function useUpdatePayrollStatusMutation() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to update payroll status");
+    },
+  });
+}
+
+export function useUpdateBatchPayrollStatusMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: BatchPayrollStatusUpdateInput) => PayrollApi.updateBatchStatus(data),
+    onSuccess: (res) => {
+      toast.success(res.message || "Batch payroll status updated successfully");
+      queryClient.invalidateQueries({ queryKey: PAYROLL_QUERY_KEY });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to update batch payroll status");
     },
   });
 }

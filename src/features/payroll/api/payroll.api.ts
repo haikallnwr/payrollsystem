@@ -1,6 +1,8 @@
 import { axiosInstance } from "@/lib/axios";
 import type { ApiResponse } from "@/types/api.type";
 import type {
+  BatchPayrollStatusUpdateInput,
+  BatchPayrollStatusUpdateResponse,
   Payroll,
   PayrollGenerateInput,
   PayrollStatusUpdateInput,
@@ -29,6 +31,11 @@ export const PayrollApi = {
 
   updateStatus: async (id: number, data: PayrollStatusUpdateInput): Promise<ApiResponse<Payroll>> => {
     const response = await axiosInstance.put<ApiResponse<Payroll>>(`/payrolls/status/${id}`, data);
+    return response.data;
+  },
+
+  updateBatchStatus: async (data: BatchPayrollStatusUpdateInput): Promise<ApiResponse<BatchPayrollStatusUpdateResponse>> => {
+    const response = await axiosInstance.patch<ApiResponse<BatchPayrollStatusUpdateResponse>>("/payrolls/bulk-status", data);
     return response.data;
   },
 };

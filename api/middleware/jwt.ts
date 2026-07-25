@@ -1,6 +1,7 @@
 import type { User } from "../generated/prisma/client";
 import jwt from "jsonwebtoken";
 import { ResponseError } from "../lib/error";
+import crypto from "node:crypto";
 
 /** Shape of the claims embedded in every access token. */
 export interface TokenPayload {
@@ -68,19 +69,13 @@ function resolveJwtSecret(): string {
   }
 
   if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "FATAL: APP_SECRET environment variable is required in production.",
-    );
+    throw new Error("FATAL: APP_SECRET environment variable is required in production.");
   }
 
   // Non-production fallback: generate an ephemeral secret.
   // This means tokens won't survive a server restart, which is acceptable for dev.
   // TODO(security): Replace with a persistent secret management solution.
-  const crypto = require("crypto") as typeof import("crypto");
   const ephemeral = crypto.randomBytes(32).toString("hex");
-  console.warn(
-    "WARNING: APP_SECRET not set. Using ephemeral random secret. " +
-      "Tokens will not survive restarts. This is NOT suitable for production.",
-  );
+  console.warn("WARNING: APP_SECRET not set. Using ephemeral random secret. " + "Tokens will not survive restarts. This is NOT suitable for production.");
   return ephemeral;
 }

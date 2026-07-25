@@ -154,8 +154,9 @@ export function OvertimeFormDialog({
               <Input
                 id="hours"
                 type="number"
-                step="0.5"
-                placeholder="2.5"
+                step="1"
+                min="1"
+                placeholder="2"
                 {...register("hours", { valueAsNumber: true })}
               />
               {errors.hours && (

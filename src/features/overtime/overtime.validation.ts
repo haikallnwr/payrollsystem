@@ -3,7 +3,7 @@ import { z } from "zod";
 export const overtimeFormSchema = z.object({
   employee_id: z.number().min(1, "Employee is required"),
   date: z.string().min(1, "Date is required"),
-  hours: z.number().min(0.5, "Hours must be at least 0.5").max(24, "Hours cannot exceed 24"),
+  hours: z.number().int("Duration must be a whole number of hours").min(1, "Hours must be at least 1").max(24, "Hours cannot exceed 24"),
   notes: z.string().optional(),
 });
 

@@ -11,5 +11,6 @@ payrollRouter.post("/generate-batch", PayrollController.generateBatchPayroll);
 payrollRouter.get("/", PayrollController.getAllPayroll);
 payrollRouter.get("/:id", PayrollController.getPayrollById);
 payrollRouter.put("/status/:id", PayrollController.updatePayrollStatus);
+payrollRouter.patch("/bulk-status", PayrollController.updateBatchPayrollStatus);
 
 export { payrollRouter };

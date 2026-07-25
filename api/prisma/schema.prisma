@@ -131,7 +131,7 @@ model Overtime {
   employee_id Int
   payroll_id  Int?
   date        DateTime
-  hours       Float
+  hours       Int
   amount      Decimal  @db.Decimal(15, 2)
   notes       String?
   created_by  Int

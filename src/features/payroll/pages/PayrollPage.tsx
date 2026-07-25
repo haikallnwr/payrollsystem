@@ -1,8 +1,11 @@
 import { useState, useMemo } from "react";
 import { usePayrollsQuery } from "../hooks/usePayrollsQuery";
-import { useUpdatePayrollStatusMutation } from "../hooks/usePayrollMutations";
+import {
+  useUpdatePayrollStatusMutation,
+  useUpdateBatchPayrollStatusMutation,
+} from "../hooks/usePayrollMutations";
 import { useGeneratePayslipMutation } from "@/features/payslip/hooks/usePayslipMutations";
-import type { Payroll } from "../payroll.type";
+import type { Payroll, PayrollStatus } from "../payroll.type";
 import type { Payslip } from "@/features/payslip/payslip.type";
 import { PayrollTable } from "../components/PayrollTable";
 import { PayrollFormDialog } from "../components/PayrollFormDialog";
@@ -10,7 +13,7 @@ import { BatchPayrollFormDialog } from "../components/BatchPayrollFormDialog";
 import { PayrollDetailModal } from "../components/PayrollDetailModal";
 import { PayslipModal } from "@/features/payslip/components/PayslipModal";
 import { Button } from "@/components/ui/button";
-import { Plus, DollarSign, Calculator, Clock, Filter, Zap } from "lucide-react";
+import { Plus, DollarSign, Calculator, Clock, Filter, Zap, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import {
   Select,
@@ -24,10 +27,14 @@ export function PayrollPage() {
   const { user } = useAuth();
   const { data: payrolls = [], isLoading } = usePayrollsQuery();
   const updateStatusMutation = useUpdatePayrollStatusMutation();
+  const updateBatchStatusMutation = useUpdateBatchPayrollStatusMutation();
   const generatePayslipMutation = useGeneratePayslipMutation();
 
   // Filter States
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+  // Selection State
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Dialog & Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -87,6 +94,36 @@ export function PayrollPage() {
       id,
       data: { status },
     });
+  };
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const selectable = filteredPayrolls
+        .filter((p) => {
+          if (p.status === "PAID") return false;
+          if (user?.role === "HR" && user?.employee?.id && p.employee_id === user.employee.id) return false;
+          return true;
+        })
+        .map((p) => p.id);
+      setSelectedIds(selectable);
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleBatchUpdateStatus = async (status: PayrollStatus) => {
+    if (selectedIds.length === 0) return;
+    await updateBatchStatusMutation.mutateAsync({
+      payroll_ids: selectedIds,
+      status,
+    });
+    setSelectedIds([]);
   };
 
   const handleGeneratePayslip = async (payroll: Payroll) => {
@@ -180,22 +217,81 @@ export function PayrollPage() {
         </div>
       </div>
 
-      {/* Status Filter Bar */}
-      <div className="flex items-center space-x-3 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <Filter className="w-4 h-4 text-slate-400 shrink-0" />
-        <span className="text-xs font-semibold text-slate-500">Filter by Status:</span>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-48 h-9 text-xs">
-            <SelectValue placeholder="All Statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Statuses</SelectItem>
-            <SelectItem value="DRAFT">Draft</SelectItem>
-            <SelectItem value="APPROVED">Approved</SelectItem>
-            <SelectItem value="PAID">Paid</SelectItem>
-            <SelectItem value="REJECTED">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Status Filter Bar & Batch Action Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+        <div className="flex items-center space-x-3">
+          <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+          <span className="text-xs font-semibold text-slate-500">Filter by Status:</span>
+          <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setSelectedIds([]); }}>
+            <SelectTrigger className="w-48 h-9 text-xs">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+              <SelectItem value="APPROVED">Approved</SelectItem>
+              <SelectItem value="PAID">Paid</SelectItem>
+              <SelectItem value="REJECTED">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Bulk Action Controls */}
+        {canManage && selectedIds.length > 0 && (
+          <div className="flex items-center space-x-2  rounded-lg shrink-0 animate-in fade-in slide-in-from-right-2 duration-200">
+            <span className="text-xs font-bold text-slate-600 px-2">
+              {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
+            </span>
+            <div className="h-4 w-px bg-slate-600" />
+            <Button
+              size="sm"
+              disabled={updateBatchStatusMutation.isPending}
+              onClick={() => handleBatchUpdateStatus("APPROVED")}
+              className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-2xs"
+            >
+              {updateBatchStatusMutation.isPending ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+              ) : (
+                <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              Approve Selected
+            </Button>
+            <Button
+              size="sm"
+              disabled={updateBatchStatusMutation.isPending}
+              onClick={() => handleBatchUpdateStatus("PAID")}
+              className="h-8 text-xs bg-emerald-800 hover:bg-emerald-900 text-white font-medium shadow-2xs"
+            >
+              {updateBatchStatusMutation.isPending ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+              ) : (
+                <DollarSign className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              Mark Selected as Paid
+            </Button>
+            <Button
+              size="sm"
+              disabled={updateBatchStatusMutation.isPending}
+              onClick={() => handleBatchUpdateStatus("REJECTED")}
+              className="h-8 text-xs bg-rose-700 hover:bg-rose-800 text-white font-medium shadow-2xs"
+            >
+              {updateBatchStatusMutation.isPending ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+              ) : (
+                <XCircle className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              Reject Selected
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedIds([])}
+              className="h-8 text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+            >
+              Clear
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main Payroll Table */}
@@ -203,6 +299,11 @@ export function PayrollPage() {
         payrolls={filteredPayrolls}
         isLoading={isLoading}
         canManage={canManage}
+        userRole={user?.role}
+        currentEmployeeId={user?.employee?.id}
+        selectedIds={selectedIds}
+        onSelectAll={handleSelectAll}
+        onToggleSelect={handleToggleSelect}
         onViewDetail={handleViewDetail}
         onUpdateStatus={handleUpdateStatus}
         onGeneratePayslip={handleGeneratePayslip}

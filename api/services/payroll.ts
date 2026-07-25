@@ -6,6 +6,8 @@ import type { TokenPayload } from "../middleware/jwt";
 import {
   BatchPayrollGenerateRequest,
   BatchPayrollResultResponse,
+  BatchPayrollStatusUpdateRequest,
+  BatchPayrollStatusUpdateResponse,
   PayrollGenerateRequest,
   PayrollResponse,
   toPayrollResponse,
@@ -307,6 +309,17 @@ export class PayrollService {
       throw new ResponseError(400, "Cannot update payroll that has already been paid");
     }
 
+    // HR Self-Processing Rule: HR cannot approve, reject, or update status for their own payroll
+    if (currentUser.role === "HR") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+
+      if (userEmployee && existing.employee_id === userEmployee.id) {
+        throw new ResponseError(403, "HR users cannot approve, reject, or update status for their own payroll.");
+      }
+    }
+
     const payroll = await prisma.payroll.update({
       where: { id: id },
       data: {
@@ -316,5 +329,63 @@ export class PayrollService {
     });
 
     return toPayrollResponse(payroll);
+  }
+
+  static async updateBatchPayrollStatus(
+    currentUser: TokenPayload,
+    request: BatchPayrollStatusUpdateRequest,
+  ): Promise<BatchPayrollStatusUpdateResponse> {
+    if (currentUser.role === "EMPLOYEE") {
+      throw new ResponseError(403, "You are not allowed to access this resource.");
+    }
+
+    const validate = Validation.validate(
+      UseValidation.PAYROLL_UPDATE_BATCH_STATUS,
+      request,
+    ) as BatchPayrollStatusUpdateRequest;
+
+    let hrEmployeeId: number | null = null;
+    if (currentUser.role === "HR") {
+      const userEmployee = await prisma.employee.findFirst({
+        where: { user_id: currentUser.id },
+      });
+      if (userEmployee) {
+        hrEmployeeId = userEmployee.id;
+      }
+    }
+
+    const whereCondition: any = {
+      id: { in: validate.payroll_ids },
+      status: { not: "PAID" },
+    };
+
+    if (hrEmployeeId !== null) {
+      whereCondition.employee_id = { not: hrEmployeeId };
+    }
+
+    const payrollsToUpdate = await prisma.payroll.findMany({
+      where: whereCondition,
+    });
+
+    if (payrollsToUpdate.length === 0) {
+      throw new ResponseError(400, "No eligible payrolls found to update status (HR users cannot process their own payroll).");
+    }
+
+    const updatedIds = payrollsToUpdate.map((p) => p.id);
+
+    await prisma.payroll.updateMany({
+      where: { id: { in: updatedIds } },
+      data: { status: validate.status },
+    });
+
+    const updatedPayrolls = await prisma.payroll.findMany({
+      where: { id: { in: updatedIds } },
+      include: payrollInclude,
+    });
+
+    return {
+      updatedCount: updatedPayrolls.length,
+      payrolls: toPayrollResponseGetAll(updatedPayrolls),
+    };
   }
 }

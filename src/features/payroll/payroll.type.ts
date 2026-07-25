@@ -63,3 +63,13 @@ export interface BatchPayrollResultResponse {
   skippedCount: number;
   payrolls: Payroll[];
 }
+
+export interface BatchPayrollStatusUpdateInput {
+  payroll_ids: number[];
+  status: PayrollStatus;
+}
+
+export interface BatchPayrollStatusUpdateResponse {
+  updatedCount: number;
+  payrolls: Payroll[];
+}

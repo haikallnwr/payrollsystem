@@ -111,13 +111,13 @@ export class UseValidation {
   static readonly OVERTIME_CREATE: ZodType = z.object({
     employee_id: z.number().int().positive(),
     date: z.coerce.date(),
-    hours: z.number().positive(),
+    hours: z.number().int().positive(),
     notes: z.string().trim().max(255).optional(),
   });
 
   static readonly OVERTIME_UPDATE: ZodType = z.object({
     date: z.coerce.date().optional(),
-    hours: z.number().positive().optional(),
+    hours: z.number().int().positive().optional(),
     notes: z.string().trim().max(255).optional(),
   });
 
@@ -143,6 +143,11 @@ export class UseValidation {
   static readonly PAYROLL_UPDATE: ZodType = z.object({
     status: z.enum(Object.values(PayrollStatus) as [PayrollStatus, ...PayrollStatus[]]).optional(),
     other_deduction: z.number().min(0).optional(),
+  });
+
+  static readonly PAYROLL_UPDATE_BATCH_STATUS: ZodType = z.object({
+    payroll_ids: z.array(z.number().int().positive()).min(1),
+    status: z.enum(Object.values(PayrollStatus) as [PayrollStatus, ...PayrollStatus[]]),
   });
 
 

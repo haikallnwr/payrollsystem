@@ -16,6 +16,7 @@ import {
   DollarSign,
   CheckCircle,
   XCircle,
+  ShieldAlert,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -31,6 +32,11 @@ interface PayrollTableProps {
   payrolls: Payroll[];
   isLoading: boolean;
   canManage: boolean;
+  userRole?: string;
+  currentEmployeeId?: number | null;
+  selectedIds: number[];
+  onSelectAll: (checked: boolean) => void;
+  onToggleSelect: (id: number) => void;
   onViewDetail: (payroll: Payroll) => void;
   onUpdateStatus: (id: number, status: "APPROVED" | "PAID" | "REJECTED") => void;
   onGeneratePayslip: (payroll: Payroll) => void;
@@ -41,6 +47,11 @@ export function PayrollTable({
   payrolls,
   isLoading,
   canManage,
+  userRole,
+  currentEmployeeId,
+  selectedIds,
+  onSelectAll,
+  onToggleSelect,
   onViewDetail,
   onUpdateStatus,
   onGeneratePayslip,
@@ -61,6 +72,16 @@ export function PayrollTable({
     ];
     return dates[m - 1] || m;
   };
+
+  const selectablePayrolls = payrolls.filter((p) => {
+    if (p.status === "PAID") return false;
+    if (userRole === "HR" && currentEmployeeId && p.employee_id === currentEmployeeId) return false;
+    return true;
+  });
+
+  const isAllSelected =
+    selectablePayrolls.length > 0 &&
+    selectablePayrolls.every((p) => selectedIds.includes(p.id));
 
   if (isLoading) {
     return (
@@ -89,6 +110,17 @@ export function PayrollTable({
       <Table>
         <TableHeader className="bg-slate-50/80 dark:bg-slate-950/50">
           <TableRow>
+            {canManage && (
+              <TableHead className="w-10 text-center">
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  disabled={selectablePayrolls.length === 0}
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-emerald-800 focus:ring-emerald-800 accent-emerald-800 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                />
+              </TableHead>
+            )}
             <TableHead className="w-24 text-xs font-bold uppercase tracking-wider">Period</TableHead>
             <TableHead className="text-xs font-bold uppercase tracking-wider">Employee</TableHead>
             <TableHead className="text-xs font-bold uppercase tracking-wider">Base Salary</TableHead>
@@ -103,9 +135,42 @@ export function PayrollTable({
           {payrolls.map((item) => {
             const totalAdditions = Number(item.overtime_total) + Number(item.reimbursement_total);
             const totalDeductions = Number(item.tax) + Number(item.other_deduction);
+            const isSelected = selectedIds.includes(item.id);
+
+            const isOwnHrPayroll =
+              userRole === "HR" &&
+              !!currentEmployeeId &&
+              item.employee_id === currentEmployeeId;
+
+            const isSelectable = canManage && item.status !== "PAID" && !isOwnHrPayroll;
 
             return (
-              <TableRow key={item.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+              <TableRow
+                key={item.id}
+                className={`transition-colors ${
+                  isSelected
+                    ? "bg-emerald-50/60 dark:bg-emerald-950/30"
+                    : "hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+                }`}
+              >
+                {/* Selection Checkbox */}
+                {canManage && (
+                  <TableCell className="text-center">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={!isSelectable}
+                      onChange={() => onToggleSelect(item.id)}
+                      title={
+                        isOwnHrPayroll
+                          ? "HR users cannot process their own payroll"
+                          : undefined
+                      }
+                      className="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-emerald-800 focus:ring-emerald-800 accent-emerald-800 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                    />
+                  </TableCell>
+                )}
+
                 {/* Period */}
                 <TableCell className="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">
                   {getMonthName(item.month)} {item.year}
@@ -113,8 +178,13 @@ export function PayrollTable({
 
                 {/* Employee Name & Code */}
                 <TableCell>
-                  <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
-                    {item.employee_name}
+                  <div className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center space-x-1.5">
+                    <span>{item.employee_name}</span>
+                    {isOwnHrPayroll && (
+                      <span className="text-[10px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded font-medium">
+                        You (HR)
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-slate-500 font-mono">{item.employee_code}</div>
                 </TableCell>
@@ -150,7 +220,7 @@ export function PayrollTable({
                     <DropdownMenuTrigger className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                       <MoreHorizontal className="w-4 h-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-52">
                       <DropdownMenuLabel className="text-xs">Payroll Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
 
@@ -161,7 +231,7 @@ export function PayrollTable({
                       </DropdownMenuItem>
 
                       {/* Management Status Transitions */}
-                      {canManage && item.status === "DRAFT" && (
+                      {canManage && !isOwnHrPayroll && item.status === "DRAFT" && (
                         <>
                           <DropdownMenuItem onClick={() => onUpdateStatus(item.id, "APPROVED")} className="text-blue-600">
                             <CheckCircle className="w-3.5 h-3.5 mr-2" />
@@ -174,10 +244,17 @@ export function PayrollTable({
                         </>
                       )}
 
-                      {canManage && item.status === "APPROVED" && (
+                      {canManage && !isOwnHrPayroll && item.status === "APPROVED" && (
                         <DropdownMenuItem onClick={() => onUpdateStatus(item.id, "PAID")} className="text-emerald-600 font-semibold">
                           <DollarSign className="w-3.5 h-3.5 mr-2" />
                           <span>Mark as Paid</span>
+                        </DropdownMenuItem>
+                      )}
+
+                      {canManage && isOwnHrPayroll && (item.status === "DRAFT" || item.status === "APPROVED") && (
+                        <DropdownMenuItem disabled className="text-amber-600 dark:text-amber-400 text-xs italic opacity-80 cursor-not-allowed">
+                          <ShieldAlert className="w-3.5 h-3.5 mr-2 shrink-0 text-amber-500" />
+                          <span>HR cannot process own payroll</span>
                         </DropdownMenuItem>
                       )}
 

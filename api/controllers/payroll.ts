@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { TokenPayload } from "../middleware/jwt";
-import type { BatchPayrollGenerateRequest, PayrollGenerateRequest } from "../models/payroll";
+import type { BatchPayrollGenerateRequest, BatchPayrollStatusUpdateRequest, PayrollGenerateRequest } from "../models/payroll";
 import { PayrollService } from "../services/payroll";
 import type { PayrollStatus } from "../generated/prisma/client";
 
@@ -77,6 +77,22 @@ export class PayrollController {
       res.status(200).json({
         code: 200,
         message: "Success update payroll status",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateBatchPayrollStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = res.locals.user as TokenPayload;
+      const request = req.body as BatchPayrollStatusUpdateRequest;
+      const result = await PayrollService.updateBatchPayrollStatus(user, request);
+
+      res.status(200).json({
+        code: 200,
+        message: `Successfully updated status for ${result.updatedCount} payroll items.`,
         data: result,
       });
     } catch (error) {
