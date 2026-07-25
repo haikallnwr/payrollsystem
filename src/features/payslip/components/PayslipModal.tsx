@@ -1,11 +1,6 @@
 import type { Payroll } from "@/features/payroll/payroll.type";
 import type { Payslip } from "../payslip.type";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Printer, Banknote, ShieldCheck } from "lucide-react";
 
@@ -16,12 +11,7 @@ interface PayslipModalProps {
   payslip: Payslip | null;
 }
 
-export function PayslipModal({
-  open,
-  onOpenChange,
-  payroll,
-  payslip,
-}: PayslipModalProps) {
+export function PayslipModal({ open, onOpenChange, payroll, payslip }: PayslipModalProps) {
   if (!payroll) return null;
 
   const formatCurrency = (val: number) => {
@@ -33,10 +23,7 @@ export function PayslipModal({
   };
 
   const getMonthName = (m: number) => {
-    const dates = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+    const dates = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     return dates[m - 1] || m;
   };
 
@@ -46,16 +33,11 @@ export function PayslipModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-175 max-h-[90vh] overflow-y-auto print:p-0 print:max-w-none print:shadow-none">
+      <DialogContent className="sm:max-w-175 max-h-[90vh] overflow-y-auto print:p-0 print:max-w-none print:shadow-none pt-12">
         <DialogHeader className="print:hidden">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold">Official Salary Payslip</DialogTitle>
-            <Button
-              onClick={handlePrint}
-              variant="outline"
-              size="sm"
-              className="bg-white hover:bg-slate-50 border-slate-200"
-            >
+            <Button onClick={handlePrint} variant="outline" size="sm" className="bg-white hover:bg-slate-50 border-slate-200">
               <Printer className="w-4 h-4 mr-2" />
               Print / Save PDF
             </Button>
@@ -71,15 +53,13 @@ export function PayslipModal({
                 <Banknote className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold tracking-tight">PAYROLL SYSTEM INC.</h3>
+                <h3 className="text-lg font-bold tracking-tight">PAYROLL SYSTEM.</h3>
                 <p className="text-xs text-slate-500">Official Monthly Compensation Statement</p>
               </div>
             </div>
 
             <div className="text-left sm:text-right font-mono">
-              <p className="text-xs font-bold text-blue-600 dark:text-blue-400">
-                {payslip?.slip_number || payroll.slip_number || "SLIP-GENERATED"}
-              </p>
+              <p className="text-xs font-bold text-slate-600 dark:text-blue-400">{payslip?.slip_number || payroll.slip_number || "SLIP-GENERATED"}</p>
               <p className="text-[11px] text-slate-500 mt-0.5">
                 Period: {getMonthName(payroll.month)} {payroll.year}
               </p>
@@ -90,9 +70,7 @@ export function PayslipModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs">
             <div>
               <p className="text-slate-400 font-medium">EMPLOYEE DETAILS</p>
-              <p className="font-bold text-sm text-slate-900 dark:text-slate-100 mt-0.5">
-                {payroll.employee_name}
-              </p>
+              <p className="font-bold text-sm text-slate-900 dark:text-slate-100 mt-0.5">{payroll.employee_name}</p>
               <p className="font-mono text-slate-500">{payroll.employee_code}</p>
             </div>
 
@@ -108,9 +86,7 @@ export function PayslipModal({
 
           {/* Detailed Itemized Line Items Table */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Salary Structure & Breakdown
-            </h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Salary Structure & Breakdown</h4>
 
             <div className="space-y-2 text-xs">
               {/* Earnings Header */}
@@ -140,9 +116,7 @@ export function PayslipModal({
 
               <div className="flex justify-between py-2 px-3 bg-slate-50 dark:bg-slate-900 font-bold text-slate-900 dark:text-slate-100">
                 <span>GROSS EARNINGS</span>
-                <span className="font-mono text-emerald-600 dark:text-emerald-400">
-                  {formatCurrency(payroll.gross_salary)}
-                </span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400">{formatCurrency(payroll.gross_salary)}</span>
               </div>
 
               {/* Deductions Header */}
@@ -152,47 +126,33 @@ export function PayslipModal({
               </div>
 
               <div className="flex justify-between py-1.5 px-3 border-b border-slate-100 dark:border-slate-900">
-                <span className="text-slate-700 dark:text-slate-300">
-                  Income Tax Deduction ({payroll.tax_percentage}%)
-                </span>
-                <span className="font-mono font-semibold text-rose-600 dark:text-rose-400">
-                  -{formatCurrency(payroll.tax)}
-                </span>
+                <span className="text-slate-700 dark:text-slate-300">Income Tax Deduction ({payroll.tax_percentage}%)</span>
+                <span className="font-mono font-semibold text-rose-600 dark:text-rose-400">-{formatCurrency(payroll.tax)}</span>
               </div>
 
               {payroll.other_deduction > 0 && (
                 <div className="flex justify-between py-1.5 px-3 border-b border-slate-100 dark:border-slate-900">
-                  <span className="text-slate-700 dark:text-slate-300">
-                    Other Deduction {payroll.other_deduction_note ? `(${payroll.other_deduction_note})` : ""}
-                  </span>
-                  <span className="font-mono font-semibold text-rose-600 dark:text-rose-400">
-                    -{formatCurrency(payroll.other_deduction)}
-                  </span>
+                  <span className="text-slate-700 dark:text-slate-300">Other Deduction {payroll.other_deduction_note ? `(${payroll.other_deduction_note})` : ""}</span>
+                  <span className="font-mono font-semibold text-rose-600 dark:text-rose-400">-{formatCurrency(payroll.other_deduction)}</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Net Take Home Total Summary Banner */}
-          <div className="p-4 bg-blue-50/80 dark:bg-blue-950/50 rounded-xl border border-blue-200 dark:border-blue-800 flex items-center justify-between">
+          <div className="p-4 bg-emerald-50/80 dark:bg-blue-950/50 rounded-xl border borde-emerald-200 dark:border-blue-800 flex items-center justify-between">
             <div>
-              <p className="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
-                NET TAKE-HOME PAY
-              </p>
+              <p className="text-xs font-bold text-slate-700 dark:text-blue-300 uppercase tracking-wider">NET TAKE-HOME PAY</p>
               <p className="text-[11px] text-slate-500">Transferred directly to bank account</p>
             </div>
 
             <div className="text-right">
-              <p className="text-2xl font-black font-mono text-blue-600 dark:text-blue-400">
-                {formatCurrency(payroll.net_salary)}
-              </p>
+              <p className="text-2xl font-black font-mono text-slate-600 dark:text-blue-400">{formatCurrency(payroll.net_salary)}</p>
             </div>
           </div>
 
           {/* Footer Note */}
-          <div className="text-center pt-2 text-[11px] text-slate-400 italic">
-            This is a computer-generated salary payslip. No signature is required.
-          </div>
+          <div className="text-center pt-2 text-[11px] text-slate-400 italic">This is a computer-generated salary payslip. No signature is required.</div>
         </div>
       </DialogContent>
     </Dialog>

@@ -3,24 +3,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { batchPayrollSchema, type BatchPayrollFormData } from "../payroll.validation";
 import { useGenerateBatchPayrollMutation } from "../hooks/useGenerateBatchPayrollMutation";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Zap, AlertCircle } from "lucide-react";
 
 interface BatchPayrollFormDialogProps {
@@ -100,7 +87,7 @@ export function BatchPayrollFormDialog({ open, onOpenChange }: BatchPayrollFormD
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2 text-slate-900 dark:text-slate-100">
-            <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
+            <Zap className="w-5 h-5 text-slate-600 fill-slate-600" />
             <span>Run Batch Monthly Payroll</span>
           </DialogTitle>
           <DialogDescription>
@@ -110,8 +97,8 @@ export function BatchPayrollFormDialog({ open, onOpenChange }: BatchPayrollFormD
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
           {/* Info Notice */}
-          <div className="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-900 flex items-start space-x-2 text-xs text-blue-800 dark:text-blue-200">
-            <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <div className="p-3 bg-emerald-50 dark:bg-blue-950/50 rounded-lg border border-emerald-200 dark:border-blue-900 flex items-start space-x-2 text-xs text-emerald-800 dark:text-blue-200">
+            <AlertCircle className="w-4 h-4 text-emerald-600 dark:text-blue-400 shrink-0 mt-0.5" />
             <div>
               Active employees without existing payrolls for this month will be created in <strong>DRAFT</strong> status. Approved reimbursements and overtimes will be locked automatically.
             </div>
@@ -121,10 +108,7 @@ export function BatchPayrollFormDialog({ open, onOpenChange }: BatchPayrollFormD
             {/* Month */}
             <div className="space-y-1.5">
               <Label htmlFor="month">Target Month</Label>
-              <Select
-                value={selectedMonth?.toString()}
-                onValueChange={(val) => setValue("month", Number(val))}
-              >
+              <Select value={selectedMonth?.toString()} onValueChange={(val) => setValue("month", Number(val))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Month" />
                 </SelectTrigger>
@@ -150,41 +134,22 @@ export function BatchPayrollFormDialog({ open, onOpenChange }: BatchPayrollFormD
           {/* Tax Percentage */}
           <div className="space-y-1.5">
             <Label htmlFor="tax_percentage">Default Income Tax Percentage (%)</Label>
-            <Input
-              id="tax_percentage"
-              type="number"
-              step="0.1"
-              placeholder="5"
-              {...register("tax_percentage", { valueAsNumber: true })}
-            />
-            {errors.tax_percentage && (
-              <p className="text-xs text-rose-500">{errors.tax_percentage.message}</p>
-            )}
+            <Input id="tax_percentage" type="number" step="0.1" placeholder="5" {...register("tax_percentage", { valueAsNumber: true })} />
+            {errors.tax_percentage && <p className="text-xs text-rose-500">{errors.tax_percentage.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Other Deduction */}
             <div className="space-y-1.5">
               <Label htmlFor="other_deduction">Default Other Deduction (Rp)</Label>
-              <Input
-                id="other_deduction"
-                type="number"
-                placeholder="0"
-                {...register("other_deduction", { valueAsNumber: true })}
-              />
-              {errors.other_deduction && (
-                <p className="text-xs text-rose-500">{errors.other_deduction.message}</p>
-              )}
+              <Input id="other_deduction" type="number" placeholder="0" {...register("other_deduction", { valueAsNumber: true })} />
+              {errors.other_deduction && <p className="text-xs text-rose-500">{errors.other_deduction.message}</p>}
             </div>
 
             {/* Deduction Note */}
             <div className="space-y-1.5">
               <Label htmlFor="other_deduction_note">Deduction Note (Optional)</Label>
-              <Input
-                id="other_deduction_note"
-                placeholder="e.g. BPJS / Default deduction"
-                {...register("other_deduction_note")}
-              />
+              <Input id="other_deduction_note" placeholder="e.g. BPJS / Default deduction" {...register("other_deduction_note")} />
             </div>
           </div>
 
@@ -192,11 +157,7 @@ export function BatchPayrollFormDialog({ open, onOpenChange }: BatchPayrollFormD
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={generateBatchMutation.isPending}
-              className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold shadow-sm"
-            >
+            <Button type="submit" disabled={generateBatchMutation.isPending} className="bg-linear-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold shadow-sm">
               {generateBatchMutation.isPending ? "Processing Batch..." : "Run Batch Generation"}
             </Button>
           </DialogFooter>
