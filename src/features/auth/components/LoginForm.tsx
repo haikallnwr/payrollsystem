@@ -65,7 +65,7 @@ export function LoginForm() {
               type="email"
               autoComplete="email"
               placeholder="admin@payroll.com"
-              className="pl-10 h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-blue-500 rounded-lg text-sm"
+              className="pl-10 h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-emerald-800 rounded-lg text-sm"
               {...register("email")}
               aria-invalid={!!errors.email}
             />
@@ -91,7 +91,7 @@ export function LoginForm() {
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               placeholder="••••••••"
-              className="pl-10 pr-10 h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-blue-500 rounded-lg text-sm"
+              className="pl-10 pr-10 h-11 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-emerald-800 rounded-lg text-sm"
               {...register("password")}
               aria-invalid={!!errors.password}
             />
@@ -116,7 +116,7 @@ export function LoginForm() {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium shadow-md shadow-blue-500/20 transition-all rounded-lg flex items-center justify-center space-x-2"
+          className="w-full h-11 bg-emerald-800 hover:bg-emerald-900 text-white font-medium shadow-md shadow-emerald-950/20 transition-all rounded-lg flex items-center justify-center space-x-2"
           disabled={isSubmitting}
         >
           {isSubmitting ? (

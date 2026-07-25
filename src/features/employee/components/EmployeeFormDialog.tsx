@@ -235,7 +235,7 @@ export function EmployeeFormDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" disabled={isSubmitting} className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium">
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />

@@ -9,7 +9,7 @@ export function DashboardLayout() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans antialiased text-slate-900 dark:text-slate-100">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block shrink-0">
+      <div className="hidden md:block shrink-0 sticky top-0 h-screen z-30 overflow-hidden">
         <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       </div>
 

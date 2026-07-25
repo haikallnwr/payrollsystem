@@ -94,7 +94,7 @@ export function EmployeePage() {
         {canManage && (
           <Button
             onClick={handleCreate}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm shrink-0"
+            className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium rounded-full shadow-sm shrink-0"
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Add Employee
@@ -105,7 +105,7 @@ export function EmployeePage() {
       {/* Summary Quick Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center space-x-3">
-          <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg">
+          <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 rounded-lg">
             <Users className="w-5 h-5" />
           </div>
           <div>

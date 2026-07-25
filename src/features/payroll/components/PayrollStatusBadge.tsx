@@ -9,29 +9,29 @@ export function PayrollStatusBadge({ status }: PayrollStatusBadgeProps) {
   switch (status) {
     case "DRAFT":
       return (
-        <Badge variant="outline" className="text-slate-600 border-slate-300 dark:text-slate-400">
+        <Badge className="bg-slate-600 border-slate-600 text-white hover:bg-slate-700">
           Draft
         </Badge>
       );
     case "APPROVED":
       return (
-        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100">
+        <Badge className="bg-blue-600 border-blue-600 text-white hover:bg-blue-700">
           Approved
         </Badge>
       );
     case "PAID":
       return (
-        <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100">
+        <Badge className="bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">
           Paid
         </Badge>
       );
     case "REJECTED":
       return (
-        <Badge className="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100">
+        <Badge className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700">
           Rejected
         </Badge>
       );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return <Badge className="bg-slate-700 border-slate-700 text-white">{status}</Badge>;
   }
 }

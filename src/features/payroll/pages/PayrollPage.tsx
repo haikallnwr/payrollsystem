@@ -126,15 +126,15 @@ export function PayrollPage() {
           <div className="flex items-center space-x-2 shrink-0">
             <Button
               onClick={() => setIsBatchFormOpen(true)}
-              className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium shadow-xs"
+              className="bg-emerald-800 hover:bg-emerald-900 text-white rounded-full font-medium shadow-xs"
             >
-              <Zap className="w-4 h-4 mr-2 fill-amber-200" />
+              <Zap className="w-4 h-4 mr-2 fill-emerald-200" />
               Run Batch Payroll
             </Button>
             <Button
               onClick={handleCreate}
               variant="outline"
-              className="border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="rounded-full border-emerald-800/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-medium"
             >
               <Plus className="w-4 h-4 mr-2" />
               Single Payroll
@@ -146,7 +146,7 @@ export function PayrollPage() {
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center space-x-3">
-          <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg">
+          <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 rounded-lg">
             <Calculator className="w-5 h-5" />
           </div>
           <div>

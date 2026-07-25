@@ -90,9 +90,9 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
                   onClick={onNavigate}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group",
+                      "flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
                       isActive
-                        ? "bg-blue-600 text-white shadow-sm shadow-blue-500/30"
+                        ? "bg-emerald-800 text-white shadow-sm shadow-emerald-900/30 font-semibold"
                         : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100",
                       collapsed && "justify-center px-2"
                     )
@@ -113,15 +113,15 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-300 relative select-none z-20",
+        "h-screen py-2 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-all duration-300 relative select-none z-20 overflow-hidden",
         collapsed ? "w-20" : "w-64"
       )}
     >
-      {/* Brand Header */}
-      <div>
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+      {/* Top Brand Header & Scrollable Nav */}
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-emerald-800 flex items-center justify-center shadow-md shadow-emerald-900/20 shrink-0">
               <Banknote className="w-5 h-5 text-white" />
             </div>
             {!collapsed && (
@@ -147,7 +147,7 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
         </div>
 
         {/* Navigation Sections */}
-        <div className="py-3 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <div className="flex-1 overflow-y-auto py-3">
           {renderNavGroup("Overview", mainNavItems)}
           {renderNavGroup("Management", managementNavItems)}
           {renderNavGroup("Finance & Ops", financeNavItems)}
@@ -156,10 +156,10 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-3 mb-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+      <div className="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 shrink-0">
         <div className={cn("flex items-center justify-between", collapsed ? "flex-col gap-2" : "")}>
           <div className="flex items-center space-x-3 overflow-hidden">
-            <Avatar className="h-9 w-9 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold text-xs shrink-0">
+            <Avatar className="h-9 w-9 bg-emerald-800 text-emerald-800 font-semibold text-xs shrink-0">
               <AvatarFallback>
                 {getInitials(user?.employee?.full_name || user?.email)}
               </AvatarFallback>
@@ -180,7 +180,7 @@ export function Sidebar({ collapsed, setCollapsed, onNavigate }: SidebarProps) {
             type="button"
             onClick={logout}
             title="Sign out"
-            className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+            className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>

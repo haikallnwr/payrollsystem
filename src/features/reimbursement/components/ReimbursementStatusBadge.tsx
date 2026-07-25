@@ -9,23 +9,23 @@ export function ReimbursementStatusBadge({ status }: ReimbursementStatusBadgePro
   switch (status) {
     case "PENDING":
       return (
-        <Badge variant="outline" className="text-amber-600 border-amber-300 dark:text-amber-400">
+        <Badge className="bg-amber-600 border-amber-600 text-white hover:bg-amber-700">
           Pending Review
         </Badge>
       );
     case "APPROVED":
       return (
-        <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100">
+        <Badge className="bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">
           Approved
         </Badge>
       );
     case "REJECTED":
       return (
-        <Badge className="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100">
+        <Badge className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700">
           Rejected
         </Badge>
       );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return <Badge className="bg-slate-700 border-slate-700 text-white">{status}</Badge>;
   }
 }

@@ -67,7 +67,7 @@ export function PayslipModal({
           {/* Header Banner */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+              <div className="w-10 h-10 rounded-xl bg-emerald-800 flex items-center justify-center text-white shadow-md shadow-emerald-950/20">
                 <Banknote className="w-5 h-5" />
               </div>
               <div>

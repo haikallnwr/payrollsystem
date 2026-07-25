@@ -33,7 +33,7 @@ export function ProfilePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 flex items-center space-x-2">
-            <UserCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <UserCheck className="w-6 h-6 text-slate-600 dark:text-blue-400" />
             <span>My User Profile</span>
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -59,7 +59,7 @@ export function ProfilePage() {
         <button
           type="button"
           onClick={() => navigate("/payrolls")}
-          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
+          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-zinc-400 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
         >
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg group-hover:scale-105 transition-transform">
@@ -77,7 +77,7 @@ export function ProfilePage() {
         <button
           type="button"
           onClick={() => navigate("/reimbursements")}
-          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
+          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-zinc-400 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
         >
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-lg group-hover:scale-105 transition-transform">
@@ -95,7 +95,7 @@ export function ProfilePage() {
         <button
           type="button"
           onClick={() => navigate("/overtimes")}
-          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
+          className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-zinc-400 dark:hover:border-blue-500 transition-all text-left group shadow-2xs"
         >
           <div className="flex items-center space-x-3">
             <div className="p-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-lg group-hover:scale-105 transition-transform">

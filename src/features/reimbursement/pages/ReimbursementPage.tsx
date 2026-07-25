@@ -79,7 +79,7 @@ export function ReimbursementPage() {
 
         <Button
           onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm shrink-0"
+          className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium rounded-full shadow-sm shrink-0"
         >
           <Plus className="w-4 h-4 mr-2" />
           Submit Claim

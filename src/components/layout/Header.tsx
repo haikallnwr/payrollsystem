@@ -34,16 +34,16 @@ export function Header() {
   const getRoleBadgeVariant = (role?: string) => {
     switch (role) {
       case "ADMIN":
-        return "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 border-purple-200 dark:border-purple-800";
+        return "bg-amber-600 text-white border-amber-600 shadow-xs";
       case "HR":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 border-blue-200 dark:border-blue-800";
+        return "bg-emerald-800 text-white border-emerald-800 shadow-xs";
       default:
-        return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700";
+        return "bg-slate-700 text-white border-slate-700 shadow-xs";
     }
   };
 
   return (
-    <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 px-4 md:px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 md:px-6 flex items-center justify-between">
       {/* Left Area: Mobile Drawer Toggle & Breadcrumbs */}
       <div className="flex items-center space-x-3">
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -71,14 +71,14 @@ export function Header() {
               user.role
             )}`}
           >
-            <Shield className="w-3 h-3 mr-1" />
+            <Shield className="w-3 h-3 mr-1 text-white" />
             {user.role}
           </Badge>
         )}
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
-            <Avatar className="h-8 w-8 bg-blue-600 text-white font-semibold text-xs">
+            <Avatar className="h-8 w-8 bg-emerald-800 text-emerald-800 font-semibold text-xs">
               <AvatarFallback>
                 {getInitials(user?.employee?.full_name || user?.email)}
               </AvatarFallback>

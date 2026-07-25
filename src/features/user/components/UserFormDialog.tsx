@@ -195,7 +195,7 @@ export function UserFormDialog({
             <Button
               type="submit"
               disabled={registerMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 font-medium"
+              className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium"
             >
               {registerMutation.isPending ? (
                 <>

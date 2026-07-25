@@ -22,11 +22,11 @@ export function AccountDetailsCard({ user }: AccountDetailsCardProps) {
     <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xs">
       <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-4">
         <CardTitle className="text-base font-bold flex items-center space-x-2 text-slate-900 dark:text-slate-100">
-          <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <ShieldCheck className="w-5 h-5 text-slate-600 dark:text-blue-400" />
           <span>System Account & Security Settings</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6 space-y-6">
+      <CardContent className="pt-2 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* User ID */}
           <div className="space-y-1">

@@ -9,23 +9,23 @@ export function EmployeeStatusBadge({ status }: EmployeeStatusBadgeProps) {
   switch (status) {
     case "ACTIVE":
       return (
-        <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100">
+        <Badge className="bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">
           Active
         </Badge>
       );
     case "RESIGNED":
       return (
-        <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:bg-amber-100">
+        <Badge className="bg-amber-600 border-amber-600 text-white hover:bg-amber-700">
           Resigned
         </Badge>
       );
     case "TERMINATED":
       return (
-        <Badge className="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800 hover:bg-rose-100">
+        <Badge className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700">
           Terminated
         </Badge>
       );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return <Badge className="bg-slate-700 border-slate-700 text-white">{status}</Badge>;
   }
 }

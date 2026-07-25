@@ -18,12 +18,12 @@ export function Breadcrumbs() {
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
-    <nav className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-slate-400">
+    <nav className="flex items-center space-x-1.5 text-sm text-slate-500 dark:text-slate-400">
       <Link
         to="/dashboard"
         className="flex items-center hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
       >
-        <Home className="w-3.5 h-3.5" />
+        <Home className="w-4 h-4" />
       </Link>
 
       {pathnames.map((value, index) => {

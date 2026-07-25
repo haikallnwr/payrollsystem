@@ -86,7 +86,7 @@ export function DivisionFormDialog({ open, onOpenChange }: DivisionFormDialogPro
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium"
             >
               {createMutation.isPending ? (
                 <>

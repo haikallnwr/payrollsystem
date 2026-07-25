@@ -89,7 +89,7 @@ export function EmployeeStatusDialog({
             <Button
               type="submit"
               disabled={updateStatusMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-emerald-800 hover:bg-emerald-900 text-white font-medium"
             >
               {updateStatusMutation.isPending ? (
                 <>

@@ -31,25 +31,30 @@ export function DashboardPage() {
       case "PAID":
       case "APPROVED":
         return (
-          <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100">
+          <Badge className="bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">
             {status}
           </Badge>
         );
       case "PENDING":
+        return (
+          <Badge className="bg-amber-600 border-amber-600 text-white hover:bg-amber-700">
+            {status}
+          </Badge>
+        );
       case "DRAFT":
         return (
-          <Badge variant="outline" className="text-amber-600 border-amber-300 dark:text-amber-400">
+          <Badge className="bg-slate-600 border-slate-600 text-white hover:bg-slate-700">
             {status}
           </Badge>
         );
       case "REJECTED":
         return (
-          <Badge variant="outline" className="text-rose-600 border-rose-300 dark:text-rose-400">
+          <Badge className="bg-rose-600 border-rose-600 text-white hover:bg-rose-700">
             {status}
           </Badge>
         );
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge className="bg-slate-700 border-slate-700 text-white">{status}</Badge>;
     }
   };
 
@@ -59,14 +64,14 @@ export function DashboardPage() {
       value: isLoading ? "..." : (stats?.totalEmployees ?? 0).toString(),
       change: "Active in database",
       icon: Users,
-      color: "text-blue-600 bg-blue-50 dark:bg-blue-950/50 dark:text-blue-400",
+      color: "text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400",
     },
     {
       title: "Monthly Payroll",
       value: isLoading ? "..." : formatRupiah(stats?.monthlyPayroll.amount ?? 0),
       change: stats?.monthlyPayroll.periodLabel || "Latest period",
       icon: Banknote,
-      color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400",
+      color: "text-emerald-800 bg-emerald-100/60 dark:bg-emerald-900/40 dark:text-emerald-300",
     },
     {
       title: "Pending Claims",
@@ -80,26 +85,26 @@ export function DashboardPage() {
       value: isLoading ? "..." : `${stats?.overtimeHours ?? 0} hrs`,
       change: "Total logged hours",
       icon: Clock,
-      color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-400",
+      color: "text-teal-700 bg-teal-50 dark:bg-teal-950/50 dark:text-teal-400",
     },
   ];
 
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl text-white shadow-lg shadow-blue-500/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-8 bg-linear-to-r from-emerald-800 via-emerald-900 to-slate-900 rounded-2xl text-white shadow-xl shadow-emerald-950/20 border border-emerald-700/30">
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Overview</span>
-            <span className="text-xs text-blue-100">{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
+            <span className="text-xs text-emerald-100">{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">Welcome back, {userName}!</h1>
-          <p className="text-sm text-blue-100 mt-1 max-w-xl">Live system statistics and payroll summary for your organization.</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2 text-white">Welcome back, {userName}!</h1>
+          <p className="text-sm text-emerald-100/90 mt-1 max-w-xl">Live system statistics and payroll summary for your organization.</p>
         </div>
 
         <div className="flex items-center space-x-3">
           {(user?.role === "ADMIN" || user?.role === "HR") && (
-            <Button onClick={() => navigate("/payrolls")} className="bg-white text-blue-600 hover:bg-blue-50 font-semibold shadow-sm">
+            <Button onClick={() => navigate("/payrolls")} className="bg-white text-emerald-900 hover:bg-emerald-50 rounded-full font-semibold shadow-md">
               <Plus className="w-4 h-4 mr-1.5" />
               Generate Payroll
             </Button>

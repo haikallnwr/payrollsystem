@@ -33,22 +33,22 @@ export function UserTable({ users, isLoading, onDelete }: UserTableProps) {
     switch (role) {
       case "ADMIN":
         return (
-          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800 flex items-center space-x-1 w-fit">
-            <ShieldAlert className="w-3 h-3 mr-1 text-purple-600 dark:text-purple-400" />
+          <Badge className="bg-purple-600 border-purple-600 text-white flex items-center space-x-1 w-fit font-semibold shadow-xs">
+            <ShieldAlert className="w-3 h-3 mr-1 text-white" />
             <span>ADMIN</span>
           </Badge>
         );
       case "HR":
         return (
-          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800 flex items-center space-x-1 w-fit">
-            <Shield className="w-3 h-3 mr-1 text-blue-600 dark:text-blue-400" />
+          <Badge className="bg-emerald-800 border-emerald-800 text-white flex items-center space-x-1 w-fit font-semibold shadow-xs">
+            <Shield className="w-3 h-3 mr-1 text-white" />
             <span>HR</span>
           </Badge>
         );
       default:
         return (
-          <Badge className="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700 flex items-center space-x-1 w-fit">
-            <User className="w-3 h-3 mr-1 text-slate-500" />
+          <Badge className="bg-slate-700 border-slate-700 text-white flex items-center space-x-1 w-fit font-semibold shadow-xs">
+            <User className="w-3 h-3 mr-1 text-white" />
             <span>EMPLOYEE</span>
           </Badge>
         );
